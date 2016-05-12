@@ -2,9 +2,28 @@
 import unittest
 
 from server import app
+from model import *
 
-class ChatTests(unittest.TestCase):
-    """Tests for my party site."""
+class ChatModelTests(unittest.TestCase):
+    '''Tests for the data model and ORM'''
+
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+
+
+class ChatAPITests(unittest.TestCase):
+    '''Tests for the API routes'''
+
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+
+
+class ChatWebTests(unittest.TestCase):
+    """Tests for the routes"""
 
     def setUp(self):
         self.client = app.test_client()

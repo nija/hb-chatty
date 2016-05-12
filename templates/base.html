@@ -1,12 +1,12 @@
 <!doctype html>
 <html>
 <head>
-  <title>{% block title %} TITLE HERE {% endblock %}</title>
+  <title> Chatty : {% block title %} TITLE HERE {% endblock %}</title>
   <link rel="stylesheet"
         href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="/static/css/party.css">
+  <link rel="stylesheet" href="../static/css/chatty.css">
 </head>
 <body>
 <div class="container">
@@ -20,5 +20,7 @@
   {% block content %}CONTENT HERE{% endblock %}
 </div>
 
+<script src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="../static/js/chatty.js"></script>
 </body>
 </html>

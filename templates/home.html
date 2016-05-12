@@ -8,8 +8,29 @@
 <p> Please chat with me</p>
 
 
+<table class="mainChatTable">
+	<thead>
+		<tr>Chat box</tr>
+	</thead>
+	<tr>
+		<td id="messageHistory">Messages appear here</td>
+	</tr>
+	<tr>
+		<td class="message_typing_row">
+			<input type="textarea" name="message_typing_box" value="Type here"></input>
+			<button id="message_typing_submit" class="btn btn-primary">Say it</button>
+		</td>
+	</tr>
+</table>
+  <h2>Order Status</h2>
 
+  <p>
+    Your order number is <b>123</b>.
+    Status: <b id="order-status">(not yet known)</b>
+  </p>
 
+  <button id="update-status" class="btn btn-primary">Get status</button>
 
+  <script src="/static/js/order-status.js"></script>
 
 {% endblock %}
