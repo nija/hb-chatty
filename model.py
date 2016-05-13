@@ -44,6 +44,17 @@ class Message(db.Model):
         return '\n<{} room.name="{}" user.name="{}" message_id={} data="{}" created_at={} expiry_at={}>'.format(
             type(self).__name__, self.room.name, self.user.name, self.message_id, self.data, self.created_at, self.expiry_at)
 
+    def serialize(self):
+        '''Serialize this'''
+        return {
+            'message_id': self.message_id,
+            'data' : self.data,
+            'created_at' : self.created_at,
+            'expiry_at' : self.expiry_at,
+            'user_id' : self.user_id,
+            'room_id' : self.room_id
+        }
+
 
 class Log(db.Model):
     '''
@@ -110,6 +121,15 @@ class Room(db.Model):
         return '\n<{} room_id={} name="{}" created_at={} expiry_at={}>'.format(
             type(self).__name__, self.room_id, self.name, self.created_at, self.expiry_at)
 
+    def serialize(self):
+        '''Serialize this'''
+        return {
+            'room_id': self.room_id,
+            'name' : self.name,
+            'created_at' : self.created_at,
+            'expiry_at' : self.expiry_at
+        }
+
     def join_room(self, user):
         '''
         Takes a user, returns an RoomUser object that needs to be added and committed
@@ -150,44 +170,96 @@ class RoomUser(db.Model):
 ##############################################################################
 # Helper functions
 
+# Set up the app if necessary
+def seed_once(app):
+    '''Create tables if none exist'''
+    # Zomg, why did this take so long to figure out??
+    query1 = """
+    SELECT count(relname)
+    FROM pg_class
+    WHERE relname = 'message'
+    """
+    db_cursor = db.session.execute(query1)
+    row = db_cursor.fetchone()
+    # Check to see if the table exists
+    if row[0] == 0:
+        #import pdb; pdb.set_trace()
+        print "\n\n\tCreating the world\n\n"
+        db.create_all()
 
+        # Create our default room
+        main_room = Room(name='Main')
+        print main_room
+        print dir(main_room)
+        db.session.add(main_room)
+        db.session.commit()
+        main_room = db.session.query(Room).get(1)
+
+        # Create the system user
+        balloonicorn = User("Balloonicorn (System User)")
+        db.session.add(balloonicorn)
+        db.session.commit()
+        balloonicorn = db.session.query(User).get(1)
+
+        # Add system user to room
+        db.session.add(main_room.join_room(balloonicorn))
+        db.session.commit()
+        print "\n\n\tOur world is complete!\n\n"
+        print balloonicorn, balloonicorn.rooms
+
+    else:      
+        print "\n\n\tOur world EXISTS!\n\tnothing to do!\n\n"
+
+# Force a clean slate
+def seed_force(app):
+    # Make sure nothing exists
+    db.drop_all()
+    seed_once(app)
+
+def test_seed_once(app, db_uri):
+    '''Create example data for the test database.'''
+
+    connect_to_db(app, db_uri)
+
+    # Get to a known good state
+    seed_once(app)
+
+    # Get users
+    balloonicorn = db.session.query(User).get(1)
 
 #TODO: Turn these into asserts and put them into tests.py
 def test_example_data(app, db_uri):
     '''Create example data for the test database.'''
 
     connect_to_db(app, db_uri)
-    
+
     # Tests follow
-    # In case there are tables, drop them
-    db.drop_all()
 
-    # Create tables
-    db.create_all()
-
-    # Create a logger
-    logs = []
+    # Reset the world
+    seed_force(app)
 
     # Create and insert Users
-    balloonicorn = User(name="Balloonicorn")
+    balloonicorn = db.session.query(User).get(1)
+    # balloonicorn = User(name="Balloonicorn")
     grace = User(name="Grace Hopper")
-    db.session.add(balloonicorn)
+    # db.session.add(balloonicorn)
     db.session.add(grace)
     db.session.commit()
 
-    # Test retrieval
+    # Test user retrieval
     users = User.query.all()
     print users
 
     # Create and insert a room
-    main_room = Room()
-    db.session.add(main_room)
-    db.session.commit()
+    main_room = db.session.query(Room).get(1)
+    # main_room = Room()
+    # db.session.add(main_room)
+    # db.session.commit()
     db.session.add(main_room.join_room(grace))
-    db.session.add(main_room.join_room(balloonicorn))
+    # db.session.add(main_room.join_room(balloonicorn))
     db.session.commit()
 
-    # Test retrieval
+    # Test room and room_user retrieval
     rooms = Room.query.all()
     room_users = RoomUser.query.all()
     print rooms
@@ -267,7 +339,8 @@ if __name__ == '__main__':
     from server import app 
     #TODO: Janky testing function that needs to be turned into multiple asserts and
     # put into tests.py
-    test_example_data(app, db_uri="postgresql:///ch")
+    #test_example_data(app, db_uri="postgresql:///ch")
+    test_seed_once(app, db_uri="postgresql:///ch")
 
     print "Connected to DB."
 
