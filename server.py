@@ -27,14 +27,42 @@ app.jinja_env.undefined = StrictUndefined
 
 # ====== Routes Definitions ======
 
+# Show homepage
 @app.route('/')
 def index():
     '''Home page'''
 
     return render_template("home.html")
 
+
+
+######  API calls  ######
+
+# Get the list of all rooms
+@app.route('/api/rooms', methods=["GET"])
+def show_all_rooms():
+    '''
+    Return jsonified rooms
+    '''
+    # We only have one room; this is niiiiice
+    rooms = Room.query.all()
+    serialize_str =''
+    for room in rooms:
+        serialize_str = repr(room.serialize()) + serialize_str
+    print serialize_str
+    return jsonify({'rooms': serialize_str})
+
+# Get a specific room
+@app.route('/api/rooms/<int:room_id>', methods=["GET"])
+def show_room(room_id):
+    '''Return jsonified room from passed in room_id'''
+    main_room = db.session.query(Room).get(room_id)
+    # print main_room
+    return jsonify(main_room.serialize())
+
+# Get a specific room's messages
 @app.route('/api/rooms/<int:room_id>/messages', methods=["GET"])
-def show_messages(room_id):
+def show_room_messages(room_id):
     '''
     Return jsonified messages from room_id
     '''
@@ -47,10 +75,10 @@ def show_messages(room_id):
     print serialize_str
     return jsonify({'messages': serialize_str})
 
-
+# Post a message
 #TODO: Data sanitization
 @app.route('/api/rooms/<int:room_id>/messages', methods=["POST"])
-def create_message(room_id):
+def create_room_message(room_id):
     '''Create a Message object from the POST data'''
     # import pdb; pdb.set_trace()
     # Can call curl with --data-binary and retrieve with request.data
@@ -72,6 +100,73 @@ def create_message(room_id):
 
     return jsonify(msg.serialize())
     #return jsonify({'hello': 'world'})
+
+# Get a specific room's users
+@app.route('/api/rooms/<int:room_id>/users', methods=["GET"])
+def show_room_users(room_id):
+    '''
+    Return jsonified users from room_id
+    '''
+    # We only have one room; this is niiiiice
+    main_room = db.session.query(Room).get(room_id)
+    users = main_room.users
+    serialize_str =''
+    for user in users:
+        serialize_str = repr(user.serialize()) + serialize_str
+    print serialize_str
+    return jsonify({'users': serialize_str})
+
+
+# Join a specific room with a given user
+@app.route('/api/rooms/<int:room_id>/users', methods=["POST"])
+def create_room_users(room_id):
+    '''
+    Have a user join a room using the user_id in the POST data
+    '''
+    # import pdb; pdb.set_trace()
+    # Can call curl with --data-binary and retrieve with request.data
+    # API test: curl --data "user_id=1" http://localhost:5001/messages
+    # print request.form
+    main_room = db.session.query(Room).get(room_id)
+    # print main_room
+    uid = int(request.form.get('user_id'))
+    # print data
+    # print type(uid), " uid: ", uid
+    user = db.session.query(User).get(uid)
+    db.session.add()
+    db.session.commit()
+    show_room_users(room_id)
+    return jsonify({'joined': True})
+
+
+# Leave a specific room with a given user
+#FIXME: This doesn't currently work
+@app.route('/api/rooms/<int:room_id>/users/leave', methods=["POST"])
+def remove_room_users(room_id):
+    '''
+    Have a user leave a room using the user_id in the POST data
+    '''
+    exit(1)
+    # import pdb; pdb.set_trace()
+    # Can call curl with --data-binary and retrieve with request.data
+    # API test: curl --data "data=bar&user_id=1" http://localhost:5001/messages
+    # print request.form
+    main_room = db.session.query(Room).get(room_id)
+    # print main_room
+    uid = int(request.form.get('user_id'))
+    # print data
+    # print type(uid), " uid: ", uid
+    user = db.session.query(User).get(uid)
+    db.session.delete(main_room.leave_room(room=room,user=user))
+    db.session.commit()
+    # Debug below
+    show_room_users(room_id)
+    return jsonify({'left': True})
+
+# Get a user
+
+
+
 
 
 

@@ -102,6 +102,14 @@ class User(db.Model):
         return '\n<{} user_id={} name="{}" created_at={}>'.format(
             type(self).__name__, self.user_id, self.name, self.created_at)
 
+    def serialize(self):
+        '''Serialize this'''
+        return {
+            'user_id': self.user_id,
+            'name' : self.name,
+            'created_at' : self.created_at
+        }
+
 
 class Room(db.Model):
     """
@@ -139,6 +147,18 @@ class Room(db.Model):
         #TODO: Put in application logging
         #"Created association: {}{}{} \n".format(joined, self, user)
         return joined
+
+    #FIXME: This doesn't work currently
+    def leave_room(self, room, user):
+        '''
+        Takes a user and room, and deletes the right object...
+        '''
+        to_delete = RoomUser.query(
+            RoomUser.room_id == room.room_id, 
+            RoomUser.user_id == user.user_id).all()
+        #TODO: Put in application logging
+        #"Created association: {}{}{} \n".format(joined, self, user)
+        return to_delete
 
 
 class RoomUser(db.Model):
