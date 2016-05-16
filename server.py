@@ -46,7 +46,7 @@ def show_all_rooms():
     '''
     # We only have one room; this is niiiiice
     rooms = Room.query.all()
-    serialize_str =''
+    serialize_str = ''
     for room in rooms:
         serialize_str = repr(room.serialize()) + serialize_str
     print serialize_str
@@ -69,7 +69,7 @@ def show_room_messages(room_id):
     # We only have one room; this is niiiiice
     main_room = db.session.query(Room).get(room_id)
     msgs = main_room.messages
-    serialize_str =''
+    serialize_str = ''
     for msg in msgs:
         serialize_str = repr(msg.serialize()) + serialize_str
     print serialize_str
@@ -110,7 +110,7 @@ def show_room_users(room_id):
     # We only have one room; this is niiiiice
     main_room = db.session.query(Room).get(room_id)
     users = main_room.users
-    serialize_str =''
+    serialize_str = ''
     for user in users:
         serialize_str = repr(user.serialize()) + serialize_str
     print serialize_str
@@ -133,10 +133,9 @@ def create_room_users(room_id):
     # print data
     # print type(uid), " uid: ", uid
     user = db.session.query(User).get(uid)
-    db.session.add()
+    db.session.add(main_room.join_room(user))
     db.session.commit()
-    show_room_users(room_id)
-    return jsonify({'joined': True})
+    return show_room_users(room_id)
 
 
 # Leave a specific room with a given user
@@ -163,7 +162,45 @@ def remove_room_users(room_id):
     show_room_users(room_id)
     return jsonify({'left': True})
 
-# Get a user
+# Get the list of all users
+@app.route('/api/users', methods=["GET"])
+def show_all_users():
+    '''
+    Return jsonified users
+    '''
+    users = User.query.all()
+    serialize_str = ''
+    for user in users:
+        serialize_str = repr(user.serialize()) + serialize_str
+    print serialize_str
+    return jsonify({'users': serialize_str})
+
+#FIXME
+# Create a user
+# API test: curl --data "name=username" http://localhost:5001/api/users
+@app.route('/api/users', methods=["POST"])
+def create_user():
+    '''Return jsonified user from passed in form data'''
+    #user = db.session.query(User).get(user_id)
+    # print user
+
+    name = request.form.get('name')
+    user = User(name=name)
+    db.session.add(user)
+    db.session.commit()
+    users = User.query.order_by(User.created_at).all()
+    print users
+    user = users[-1]
+
+    return jsonify(user.serialize())
+
+# Get a specific user
+@app.route('/api/users/<int:user_id>', methods=["GET"])
+def show_user(user_id):
+    '''Return jsonified user from passed in user_id'''
+    user = db.session.query(User).get(user_id)
+    # print user
+    return jsonify(user.serialize())
 
 
 
