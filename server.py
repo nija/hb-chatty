@@ -69,10 +69,10 @@ def show_room_messages(room_id):
     # We only have one room; this is niiiiice
     main_room = db.session.query(Room).get(room_id)
     msgs = main_room.messages
-    serialize_str = ''
+    serialize_str = ']'
     for msg in msgs:
         serialize_str = repr(msg.serialize()) + serialize_str
-    print serialize_str
+    serialize_str += ']'
     return jsonify({'messages': serialize_str})
 
 # Post a message
@@ -175,7 +175,7 @@ def show_all_users():
     print serialize_str
     return jsonify({'users': serialize_str})
 
-#FIXME
+
 # Create a user
 # API test: curl --data "name=username" http://localhost:5001/api/users
 @app.route('/api/users', methods=["POST"])
@@ -189,7 +189,7 @@ def create_user():
     db.session.add(user)
     db.session.commit()
     users = User.query.order_by(User.created_at).all()
-    print users
+    # print users
     user = users[-1]
 
     return jsonify(user.serialize())

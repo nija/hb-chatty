@@ -2,16 +2,28 @@
 <html>
 <head>
   <title> Chatty : {% block title %} TITLE HERE {% endblock %}</title>
-  <link rel="stylesheet"
+  <!-- Load JQuery -->
+  <script type="text/javascript"
+        src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+  <!-- Load Bootstrap -->
+  <link rel="stylesheet" 
+        type='text/css'
         href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css">
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-  <link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="../static/css/chatty.css">
+  <script type="text/javascript"
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <!-- Load Google Fonts -->
+  <link href='https://fonts.googleapis.com/css?family=Lobster' 
+        rel='stylesheet' 
+        type='text/css'>
+  <!-- Load my custom CSS -->
+  <link rel="stylesheet"
+        type="text/css"
+        href="../static/css/chatty.css">
 </head>
 <body>
 <div class="container">
   <h1>
-    <a href="/">Balloonicorn's Land of Milk and Honey</a>
+    <a href="/"><center>Balloonicorn's Land of Milk and Honey <br /> AKA Funky Town!</center></a>
   </h1>
   {% for msg in get_flashed_messages() %}
     <div class="alert alert-info">{{ msg }}</div>
@@ -20,7 +32,7 @@
   {% block content %}CONTENT HERE{% endblock %}
 </div>
 
-<script src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="../static/js/chatty.js"></script>
+
+<!-- <script type="text/javascript" src="../static/js/chatty.js"></script> -->
 </body>
 </html>
