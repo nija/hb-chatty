@@ -1,5 +1,8 @@
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.inspection import inspect
 from datetime import datetime, timedelta
+from flask.json import JSONEncoder
+# from contextlib import suppress
 
 # How long to persist data we care about
 EXPIRE_DELTA = 2
@@ -8,8 +11,50 @@ EXPIRE_DELTA = 2
 db = SQLAlchemy()
 
 
-# Basic model
 
+##############################################################################
+# Mix-ins and support classes
+
+# JSONify all the things natively
+class ModelMixin(object):
+    '''
+    Provide dict-like interface to db.Model subclasses
+    '''
+    def __getitem__(self, key):
+        '''
+        Expose attributes like dict values
+        '''
+        return getattr(self, key)
+
+    def keys(self):
+        '''
+        Figure out which database columns exist
+        '''
+        return inspect(self).attrs.keys()
+
+
+class MyJSONEncoder(JSONEncoder):
+    '''
+    Override the default JSONEncoder class
+    '''
+    def default(self, obj):
+        # Optional: convert datetime objects to ISO format
+        # with suppress(AttributeError):
+        #     return obj.isoformat()
+        try:
+            return obj.isoformat()
+        except AttributeError:
+            pass
+
+        return dict(obj)
+
+# Moved this to server.py
+# app.json_encoder = MyJSONEncoder
+
+##############################################################################
+# Basic Classes
+
+# class Message(db.Model):
 class Message(db.Model):
     '''
     Representation of a Message object.
@@ -41,16 +86,31 @@ class Message(db.Model):
         '''
         Return the string representation of the Message
         '''
-        return '\n<{} room.name="{}" user.name="{}" message_id={} data="{}" created_at={} expiry_at={}>'.format(
-            type(self).__name__, self.room.name, self.user.name, self.message_id, self.data, self.created_at, self.expiry_at)
+        # return '\n<{} room.name="{}" user.name="{}" message_id={} data="{}" created_at={} expiry_at={}>'.format(
+        #     type(self).__name__, self.room.name, self.user.name, self.message_id, self.data, self.created_at.isoformat(), self.expiry_at.isoformat())
+        return '\n<{} room.name="{}" user.name="{}" message_id={} data="{}">'.format(
+            type(self).__name__, self.room.name, self.user.name, self.message_id, self.data)
+
+    # def __dict__(self):
+        '''Return a dictionary object representation'''
+        msg_dict = {
+            'message_id': self.message_id,
+            'data' : self.data,
+            # 'created_at' : self.created_at.isoformat(),
+            # 'expiry_at' : self.expiry_at.isoformat(),
+            'user_id' : self.user_id,
+            'room_id' : self.room_id
+        }
+        print msg_dict
+        return msg_dict
 
     def serialize(self):
         '''Serialize this'''
         return {
             'message_id': self.message_id,
             'data' : self.data,
-            'created_at' : self.created_at,
-            'expiry_at' : self.expiry_at,
+            # 'created_at' : self.created_at.isoformat(),
+            # 'expiry_at' : self.expiry_at.isoformat(),
             'user_id' : self.user_id,
             'room_id' : self.room_id
         }
@@ -161,6 +221,12 @@ class Room(db.Model):
         return to_delete
 
 
+    def messages_as_json(self):
+        '''Reurn room messages as JSON
+        '''
+        return [ msg.serialize() for msg in self.messages]
+
+
 class RoomUser(db.Model):
     '''
     Relates the User and Room classes
@@ -186,6 +252,7 @@ class RoomUser(db.Model):
         '''Returns a useful string representation of the room-user association'''
         return '\n<{} room_user_id={} room_id="{}" user_id="{}" time_stamp={}>'.format(
             type(self).__name__, self.room_user_id, self.room_id, self.user_id, self.time_stamp)
+
 
 ##############################################################################
 # Helper functions
@@ -284,7 +351,7 @@ def test_create_get_messages(app):
     balloonicorn = db.session.query(User).get(1)
     grace = User.query.filter(User.name == 'Grace Hopper').first()
     main_room = db.session.query(Room).get(1)
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     a_message = Message(room=main_room, user=grace, data="Please cut off a nanosecond and send it over to me")
     b_message = Message(room=main_room, user=grace, data='I need something to compare this to. Could I please have a microsecond?')
     c_message = Message(room=main_room, user=grace, data='I had a running compiler and nobody would touch it... they carefully told me, computers could only do arithmetic; they could not do programs.')
@@ -434,9 +501,9 @@ if __name__ == '__main__':
     from server import app 
     #TODO: Janky testing function that needs to be turned into multiple asserts
     #      and put into tests.py
-    #test_example_data(app, db_uri="postgresql:///cha")
-    #test_seed_once(app, db_uri="postgresql:///ch")
-    connect_to_db(app, db_uri="postgresql:///cha")
+    # test_example_data(app, db_uri="postgresql:///cha")
+    # test_seed_once(app, db_uri="postgresql:///ch")
+    connect_to_db(app, db_uri="postgresql:///ch")
     print "Connected to DB."
 
 

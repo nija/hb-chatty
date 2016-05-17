@@ -4,7 +4,7 @@ from datetime import datetime
 from jinja2 import StrictUndefined
 from flask import Flask, jsonify, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-from model import Message, Room, User, connect_to_db, db, seed_once, seed_force
+from model import Message, ModelMixin, MyJSONEncoder, Room, User, connect_to_db, db, seed_once, seed_force
 
 # Log all the things
 #TODO: Add loggers
@@ -58,7 +58,7 @@ def show_room(room_id):
     '''Return jsonified room from passed in room_id'''
     main_room = db.session.query(Room).get(room_id)
     # print main_room
-    return jsonify(main_room.serialize())
+    return jsonify(main_room)
 
 # Get a specific room's messages
 @app.route('/api/rooms/<int:room_id>/messages', methods=["GET"])
@@ -67,13 +67,40 @@ def show_room_messages(room_id):
     Return jsonified messages from room_id
     '''
     # We only have one room; this is niiiiice
+    print "\n\nIn show_room_messages"
     main_room = db.session.query(Room).get(room_id)
-    msgs = main_room.messages
-    serialize_str = ']'
-    for msg in msgs:
-        serialize_str = repr(msg.serialize()) + serialize_str
-    serialize_str += ']'
-    return jsonify({'messages': serialize_str})
+    print main_room
+    # print main_room.messages
+    msgs = main_room.messages_as_json()
+    # msg = msgs[0]
+    # message_list = [ msg.serialize() for msg in main_room.messages]
+    # serialize_str = ''
+    # serialize_str = '['
+    # for msg in msgs:
+    #     serialize_str += repr(msg.serialize())
+    # for i, msg in enumerate(msgs):
+    #     serialize_str += jsonify(i = msg)
+    # serialize_str += ']'
+    # return_dict = {}
+    # for msg in main_room.messages:
+    #     return_dict = dict(msg)
+    # return jsonify(return_dict)
+    # print serialize_str
+    # print "\n\n\tmsg type:", type(msgs[0]), "\n\n\tmsg:", msgs[0]
+    # print "\n\n\tmsgs type:", type(msgs), "\n\n\tmsgs:", msgs
+
+    jjson = jsonify({"messages" : msgs})
+    print jjson
+
+    return jjson
+    # return jsonify({"messages": [{
+    #                     "message_id": 100,
+    #                     "data": "fake",
+    #                     "user_id": 1,
+    #                     "room_id": 1
+    #                     }]
+    #                 })
+    # # return jsonify({"messages": msgs})
 
 # Post a message
 #TODO: Data sanitization
@@ -156,7 +183,7 @@ def remove_room_users(room_id):
     # print data
     # print type(uid), " uid: ", uid
     user = db.session.query(User).get(uid)
-    db.session.delete(main_room.leave_room(room=room,user=user))
+    db.session.delete(main_room.leave_room(room=main_room, user=user))
     db.session.commit()
     # Debug below
     show_room_users(room_id)
@@ -216,6 +243,10 @@ if __name__ == "__main__":
     connect_to_db(app)
     # Prod
     #connect_to_db(app, db_uri="postgresql:///chatty")
+
+    # Override the default JSONEncoder so the custom one knows how to handle
+    # our classes
+    app.json_encoder = MyJSONEncoder
 
     # Create our data schema and default objects if needed
     seed_once(app)
