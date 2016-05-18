@@ -11,30 +11,24 @@
 <table class="mainChatTable">
 	<thead>
 		<tr>
-			<td>Chat box</td>
+			<td>Chat room</td>
 		</tr>
 	</thead>
 	<tr>
-		<td id="messageHistory">Messages appear here</td>
+		<td id="messageHistory">Live long and be chatty!</td>
 		<script type="text/javascript" src="/static/js/loadChat.js"></script>
 	</tr>
 	<tr>
 		<td class="message_typing_row">
-			<input type="textarea" name="message_typing_box" id="message_typing_box"> </input>
+			<input type="text" 
+					name="message_typing_box" 
+					id="message_typing_box" 
+					autofocus="True" 
+					maxlength="1000"/>
 			<button id="message_typing_submit" class="btn btn-primary">Say it</button>
 			<script type="text/javascript" src="/static/js/submitMessage.js"></script>
 		</td>
 	</tr>
 </table>
-<!--   <h2>Order Status</h2>
-
-  <p>
-    Your order number is <b>123</b>.
-    Status: <b id="order-status">(not yet known)</b>
-  </p>
-
-  <button id="update-status" class="btn btn-primary">Get status</button>
-
-  <script src="/static/js/order-status.js"></script> -->
 
 {% endblock %}

@@ -4,7 +4,7 @@ from datetime import datetime
 from jinja2 import StrictUndefined
 from flask import Flask, jsonify, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-from model import Message, ModelMixin, MyJSONEncoder, Room, User, connect_to_db, db, seed_once, seed_force
+from model import Message, MyJSONEncoder, Room, User, connect_to_db, db, seed_once, seed_force
 
 # Log all the things
 #TODO: Add loggers
@@ -67,11 +67,10 @@ def show_room_messages(room_id):
     Return jsonified messages from room_id
     '''
     # We only have one room; this is niiiiice
-    print "\n\nIn show_room_messages"
     main_room = db.session.query(Room).get(room_id)
     print main_room
     # print main_room.messages
-    msgs = main_room.messages_as_json()
+    # msgs = main_room.messages_as_json()
     # msg = msgs[0]
     # message_list = [ msg.serialize() for msg in main_room.messages]
     # serialize_str = ''
@@ -89,7 +88,7 @@ def show_room_messages(room_id):
     # print "\n\n\tmsg type:", type(msgs[0]), "\n\n\tmsg:", msgs[0]
     # print "\n\n\tmsgs type:", type(msgs), "\n\n\tmsgs:", msgs
 
-    jjson = jsonify({"messages" : msgs})
+    jjson = jsonify({"messages" : main_room.messages_as_json()})
     print jjson
 
     return jjson
@@ -115,8 +114,8 @@ def create_room_message(room_id):
     # print main_room
     data = request.form.get('data')
     uid = int(request.form.get('user_id'))
-    # print data
-    # print type(uid), " uid: ", uid
+    print "\n\n\tdata: ", data
+    print "\n\n\t", type(uid), " uid: ", uid
     user = db.session.query(User).get(uid)
     msg = Message(user=user, room=main_room, data=data)
     db.session.add(msg)
@@ -125,8 +124,7 @@ def create_room_message(room_id):
     #print "\nMessages:\n", msgs
     msg = msgs[-1]
 
-    return jsonify(msg.serialize())
-    #return jsonify({'hello': 'world'})
+    return jsonify({"messages": main_room.messages_as_json()})
 
 # Get a specific room's users
 @app.route('/api/rooms/<int:room_id>/users', methods=["GET"])
@@ -136,12 +134,7 @@ def show_room_users(room_id):
     '''
     # We only have one room; this is niiiiice
     main_room = db.session.query(Room).get(room_id)
-    users = main_room.users
-    serialize_str = ''
-    for user in users:
-        serialize_str = repr(user.serialize()) + serialize_str
-    print serialize_str
-    return jsonify({'users': serialize_str})
+    return jsonify({'users': main_room.users_as_json()})
 
 
 # Join a specific room with a given user
@@ -195,12 +188,12 @@ def show_all_users():
     '''
     Return jsonified users
     '''
-    users = User.query.all()
-    serialize_str = ''
-    for user in users:
-        serialize_str = repr(user.serialize()) + serialize_str
-    print serialize_str
-    return jsonify({'users': serialize_str})
+    # users = User.query.all()
+    # serialize_str = ''
+    # for user in users:
+    #     serialize_str = repr(user.serialize()) + serialize_str
+    # print serialize_str
+    return jsonify({'users': [user.serialize() for user in User.query.all()]})
 
 
 # Create a user
@@ -208,26 +201,19 @@ def show_all_users():
 @app.route('/api/users', methods=["POST"])
 def create_user():
     '''Return jsonified user from passed in form data'''
-    #user = db.session.query(User).get(user_id)
-    # print user
-
     name = request.form.get('name')
     user = User(name=name)
     db.session.add(user)
     db.session.commit()
     users = User.query.order_by(User.created_at).all()
-    # print users
-    user = users[-1]
 
-    return jsonify(user.serialize())
+    return jsonify(users[-1].as_json())
 
 # Get a specific user
 @app.route('/api/users/<int:user_id>', methods=["GET"])
 def show_user(user_id):
     '''Return jsonified user from passed in user_id'''
-    user = db.session.query(User).get(user_id)
-    # print user
-    return jsonify(user.serialize())
+    return jsonify(db.session.query(User).get(user_id).as_json())
 
 
 

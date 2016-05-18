@@ -15,24 +15,6 @@ db = SQLAlchemy()
 ##############################################################################
 # Mix-ins and support classes
 
-# JSONify all the things natively
-class ModelMixin(object):
-    '''
-    Provide dict-like interface to db.Model subclasses
-    '''
-    def __getitem__(self, key):
-        '''
-        Expose attributes like dict values
-        '''
-        return getattr(self, key)
-
-    def keys(self):
-        '''
-        Figure out which database columns exist
-        '''
-        return inspect(self).attrs.keys()
-
-
 class MyJSONEncoder(JSONEncoder):
     '''
     Override the default JSONEncoder class
@@ -54,13 +36,11 @@ class MyJSONEncoder(JSONEncoder):
 ##############################################################################
 # Basic Classes
 
-# class Message(db.Model):
 class Message(db.Model):
     '''
-    Representation of a Message object.
-    Uses a global called EXPIRE DELTA
+    Representation of a Message object
+    Uses a global called EXPIRE DELTA to set default data retention
     '''
-
     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     data = db.Column(db.String(2048))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -91,54 +71,48 @@ class Message(db.Model):
         return '\n<{} room.name="{}" user.name="{}" message_id={} data="{}">'.format(
             type(self).__name__, self.room.name, self.user.name, self.message_id, self.data)
 
-    # def __dict__(self):
-        '''Return a dictionary object representation'''
-        msg_dict = {
-            'message_id': self.message_id,
-            'data' : self.data,
-            # 'created_at' : self.created_at.isoformat(),
-            # 'expiry_at' : self.expiry_at.isoformat(),
-            'user_id' : self.user_id,
-            'room_id' : self.room_id
-        }
-        print msg_dict
-        return msg_dict
-
     def serialize(self):
         '''Serialize this'''
         return {
             'message_id': self.message_id,
             'data' : self.data,
-            # 'created_at' : self.created_at.isoformat(),
+            'created_at' : self.created_at.isoformat(),
             # 'expiry_at' : self.expiry_at.isoformat(),
             'user_id' : self.user_id,
+            'user_name': self.user.name,
             'room_id' : self.room_id
         }
 
-
-class Log(db.Model):
-    '''
-    Representation of a Log object.
-    Uses a global called EXPIRE DELTA
-    '''
-    #TODO: Figure out if this is even needed 
-
-    log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    data = db.Column(db.String(2048))
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    expiry_at = db.Column(db.DateTime)
-
-    def __init__(self, data="This is a test log from a blue balloon"):
-        self.data = data
-        self.created_at = datetime.utcnow()
-        self.expiry_at = self.created_at + timedelta(days=EXPIRE_DELTA)
-
-    def __repr__(self):
+    def return_as_json(self):
         '''
-        Return the string representation of the Log
+        Another way to call serialize; included for consistency
         '''
-        return '\n<{} log_id={} data="{}" created_at={} expiry_at={}>'.format(
-            type(self).__name__, self.log_id, self.data, self.created_at, self.expiry_at)
+        return self.serialize()
+
+
+# class Log(db.Model):
+#     '''
+#     Representation of a Log object.
+#     Uses a global called EXPIRE DELTA
+#     '''
+#     #TODO: Figure out if this is even needed 
+
+#     log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     data = db.Column(db.String(2048))
+#     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+#     expiry_at = db.Column(db.DateTime)
+
+#     def __init__(self, data="This is a test log from a blue balloon"):
+#         self.data = data
+#         self.created_at = datetime.utcnow()
+#         self.expiry_at = self.created_at + timedelta(days=EXPIRE_DELTA)
+
+#     def __repr__(self):
+#         '''
+#         Return the string representation of the Log
+#         '''
+#         return '\n<{} log_id={} data="{}" created_at={} expiry_at={}>'.format(
+#             type(self).__name__, self.log_id, self.data, self.created_at, self.expiry_at)
 
 
 class User(db.Model):
@@ -171,6 +145,20 @@ class User(db.Model):
         }
 
 
+    def as_json(self):
+        return self.serialize()
+
+    def messages_as_json(self):
+        '''Return user messages as a JSON list
+        '''
+        return [ msg.serialize() for msg in self.messages]
+
+    def rooms_as_json(self):
+        '''Return user's rooms as a JSON list
+        '''
+        return [ room.serialize() for room in self.rooms]
+
+
 class Room(db.Model):
     """
     Representation of a Room object.
@@ -198,6 +186,10 @@ class Room(db.Model):
             'expiry_at' : self.expiry_at
         }
 
+    def as_json(self):
+        '''Another way to call serialize; included for consistency'''
+        return self.serialize()
+
     def join_room(self, user):
         '''
         Takes a user, returns an RoomUser object that needs to be added and committed
@@ -222,9 +214,14 @@ class Room(db.Model):
 
 
     def messages_as_json(self):
-        '''Reurn room messages as JSON
+        '''Return room messages as a JSON list
         '''
         return [ msg.serialize() for msg in self.messages]
+
+    def users_as_json(self):
+        '''Return room users as a JSON list
+        '''
+        return [ msg.serialize() for msg in self.users]
 
 
 class RoomUser(db.Model):

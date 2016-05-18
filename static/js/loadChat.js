@@ -2,33 +2,23 @@
 
 // Define the success function aka callback
 function loadMessagesOnPageLoad(results) {
-    // window.results = results;
-    // console.log('results attaced');
     // Define a return string
     var history = "Test<br>";
-    // console.log(results)
-    // console.log(history)
     // for every object in the results list
-    // results.forEach(function (element, index, array) {
-    //     console.log('a[' + index + '] = ' + element);
-    // })
-    // console.log("results: " + results.messages)
     var messages = results.messages;
-    // var history = results.messages;
-    // var messages = JSON.parse(results.messages);
-    console.log("length: " + messages.length);
-    console.log("messages: " + messages);
+    // console.log("length: " + messages.length);
+    // console.log("messages: " + messages);
     // var dataArray = [{"id":28,"class":"Sweden"}, {"id":56,"class":"USA"}, {"id":89,"class":"England"}];
     // debugger;
     for (var i = 0; i < messages.length; i++) { 
-        history += "User " + messages[i].user_id + ": " + messages[i].data + "<br>";
+        // var userName = $('#username').val()
+        // history += userName + ": " + messages[i].data + "<br>";
+        history += messages[i].created_at + " &nbsp;&nbsp; " + messages[i].user_name + ": " + messages[i].data + "<br>";
+        //
     };
-
-    // var dataArray = [{"id":28,"class":"Sweden"}, {"id":56,"class":"USA"}, {"id":89,"class":"England"}];
-    
+ 
     // $(jQuery.parseJSON(JSON.stringify(messages)))
     // $(jQuery.parseJSON(messages))
-    // JSON.decode(messages)
 
     // $(jQuery.parseJSON(JSON.stringify(dataArray))).each(function() {  
     //      var ID = this.id;
@@ -41,24 +31,14 @@ function loadMessagesOnPageLoad(results) {
     // Replace the return string
     $('#messageHistory').html(history);
 
-    // var new_msg = results.user_id + ": " + results.data;
-    // console.log(new_msg);
-    // $('#messageHistory').html(results.data);
     console.log("Finished replaceStatus");
 }
 
 // Define the event handler
 function firstLoadOfChat(evt) {
-    // var messageInput = {
-    //     "data": $("#message_typing_box").val(),
-    //     "user_id": 1
-    // };
+    // AJAX call
     $.getJSON("/api/rooms/1/messages",loadMessagesOnPageLoad);
-
-    // $.post('/api/rooms/1/messages', messageInput, replaceStatus);
-    // console.log("Finished sending AJAX for user_id " + messageInput.user_id + ": " + messageInput.data);
 }
 
 // Add the event handler to the click event for the button
 $(document).ready(firstLoadOfChat);
-// $('#message_typing_submit').load(firstLoadOfChat);
