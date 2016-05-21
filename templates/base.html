@@ -19,11 +19,15 @@
   <link rel="stylesheet"
         type="text/css"
         href="../static/css/chatty.css">
+  <!-- Load my custom javascript -->
+  <script type="text/javascript" src="/static/js/loadChat.js"></script>
+  <script type="text/javascript" src="/static/js/chatty.js"></script>
+
 </head>
 <body>
 <div class="container">
   <h1>
-    <a href="/"><center>Balloonicorn's Land of Milk and Honey <br /> AKA Funky Town!</center></a>
+    <a href="/"><center>Balloonicorn's Land of Milk and Honey</center></a>
   </h1>
   {% for msg in get_flashed_messages() %}
     <div class="alert alert-info">{{ msg }}</div>

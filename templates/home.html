@@ -3,20 +3,15 @@
 {% block title %} It's a Party! {% endblock %}
 
 {% block content %}
-
-<p> This is the home page</p>
-<p> Please chat with me</p>
-
-
+<center>
 <table class="mainChatTable">
 	<thead>
 		<tr>
-			<td>Chat room</td>
+			<td><h3>Chat room</h3></td>
 		</tr>
 	</thead>
 	<tr>
 		<td id="messageHistory">Live long and be chatty!</td>
-		<script type="text/javascript" src="/static/js/loadChat.js"></script>
 	</tr>
 	<tr>
 		<td class="message_typing_row">
@@ -24,11 +19,12 @@
 					name="message_typing_box" 
 					id="message_typing_box" 
 					autofocus="True" 
-					maxlength="1000"/>
+					maxlength="2040"
+					placeholder="Enter your message" />
 			<button id="message_typing_submit" class="btn btn-primary">Say it</button>
-			<script type="text/javascript" src="/static/js/submitMessage.js"></script>
 		</td>
 	</tr>
 </table>
+</center>
 
 {% endblock %}

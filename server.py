@@ -1,8 +1,9 @@
 '''Chat Engine'''
 # pylint: disable=I0011,C0103
+import os
 from datetime import datetime
 from jinja2 import StrictUndefined
-from flask import Flask, jsonify, render_template, redirect, request, flash, session
+from flask import Flask, jsonify, render_template, redirect, request, flash, send_from_directory, session
 from flask_debugtoolbar import DebugToolbarExtension
 from model import Message, MyJSONEncoder, Room, User, connect_to_db, db, seed_once, seed_force
 
@@ -25,6 +26,7 @@ app.jinja_env.undefined = StrictUndefined
 
 # ====== END Server Start-up ======
 
+
 # ====== Routes Definitions ======
 
 # Show homepage
@@ -34,7 +36,11 @@ def index():
 
     return render_template("home.html")
 
-
+@app.route('/favicon.ico')
+def serve_favicon():
+    '''Serve our favicon'''
+    return send_from_directory(os.path.join(app.root_path, 'static/img'), 'favicon.ico')
+                               #'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 ######  API calls  ######
 
@@ -45,20 +51,13 @@ def show_all_rooms():
     Return jsonified rooms
     '''
     # We only have one room; this is niiiiice
-    rooms = Room.query.all()
-    serialize_str = ''
-    for room in rooms:
-        serialize_str = repr(room.serialize()) + serialize_str
-    print serialize_str
-    return jsonify({'rooms': serialize_str})
+    return jsonify({'rooms': [room.as_json() for room in Room.query.all()]})
 
 # Get a specific room
 @app.route('/api/rooms/<int:room_id>', methods=["GET"])
 def show_room(room_id):
     '''Return jsonified room from passed in room_id'''
-    main_room = db.session.query(Room).get(room_id)
-    # print main_room
-    return jsonify(main_room)
+    return jsonify(db.session.query(Room).get(room_id).as_json())
 
 # Get a specific room's messages
 @app.route('/api/rooms/<int:room_id>/messages', methods=["GET"])
@@ -66,63 +65,62 @@ def show_room_messages(room_id):
     '''
     Return jsonified messages from room_id
     '''
-    # We only have one room; this is niiiiice
-    main_room = db.session.query(Room).get(room_id)
-    print main_room
-    # print main_room.messages
-    # msgs = main_room.messages_as_json()
-    # msg = msgs[0]
-    # message_list = [ msg.serialize() for msg in main_room.messages]
-    # serialize_str = ''
-    # serialize_str = '['
-    # for msg in msgs:
-    #     serialize_str += repr(msg.serialize())
-    # for i, msg in enumerate(msgs):
-    #     serialize_str += jsonify(i = msg)
-    # serialize_str += ']'
-    # return_dict = {}
-    # for msg in main_room.messages:
-    #     return_dict = dict(msg)
-    # return jsonify(return_dict)
-    # print serialize_str
-    # print "\n\n\tmsg type:", type(msgs[0]), "\n\n\tmsg:", msgs[0]
-    # print "\n\n\tmsgs type:", type(msgs), "\n\n\tmsgs:", msgs
+    default_limit_responses = 15
+    room = db.session.query(Room).get(room_id)
 
-    jjson = jsonify({"messages" : main_room.messages_as_json()})
-    print jjson
+    # If called with a time stamp
+    last_updated = request.args.get("last_updated")
 
-    return jjson
-    # return jsonify({"messages": [{
-    #                     "message_id": 100,
-    #                     "data": "fake",
-    #                     "user_id": 1,
-    #                     "room_id": 1
-    #                     }]
-    #                 })
-    # # return jsonify({"messages": msgs})
+    # Set room_msgs to be the time range or the limit of the number of messages
+    if last_updated:
+        dt_last_updated = datetime.fromtimestamp(int(last_updated))
+        print type(dt_last_updated), dt_last_updated
+        room_msgs = db.session.query(Message).filter(
+            Message.room_id == room.room_id,
+            Message.created_at > dt_last_updated).order_by(
+            Message.created_at).all()
+    else:
+        room_msgs = db.session.query(Message).filter(
+            Message.room_id == room.room_id).order_by(
+            Message.created_at).all()
+
+    # If called with a limit
+    limit_responses = request.args.get("limit_responses")
+    if not limit_responses:
+        if len(room_msgs) > default_limit_responses:
+            limit_responses = default_limit_responses * -1
+        else:
+            default_limit_responses = len(room_msgs) * -1
+    else:
+        limit_responses = int(limit_responses) * -1
+
+    # print "\n\n\t", type(limit_responses), limit_responses
+    # print "\n\n\t", type(room_msgs), len(room_msgs), room_msgs[limit_responses:]
+    return jsonify({"messages" : [msg.as_json() for msg in room_msgs[limit_responses:]]})
+
+
 
 # Post a message
 #TODO: Data sanitization
 @app.route('/api/rooms/<int:room_id>/messages', methods=["POST"])
 def create_room_message(room_id):
     '''Create a Message object from the POST data'''
-    # import pdb; pdb.set_trace()
     # Can call curl with --data-binary and retrieve with request.data
-    # API test: curl --data "data=bar&user_id=1" http://localhost:5001/messages
+    # API test: curl --data "data=Hi, I am Sally&user_id=3" http://localhost:5001/api/rooms/1/messages
     # print request.form
     main_room = db.session.query(Room).get(room_id)
-    # print main_room
     data = request.form.get('data')
     uid = int(request.form.get('user_id'))
-    print "\n\n\tdata: ", data
-    print "\n\n\t", type(uid), " uid: ", uid
     user = db.session.query(User).get(uid)
     msg = Message(user=user, room=main_room, data=data)
+
+    # Create the date fields using the database
     db.session.add(msg)
     db.session.commit()
-    msgs = Message.query.order_by(Message.message_id).all()
-    #print "\nMessages:\n", msgs
-    msg = msgs[-1]
+
+    # To access the newly created object
+    # msgs = Message.query.order_by(Message.message_id).all()
+    # msg = msgs[-1]
 
     return jsonify({"messages": main_room.messages_as_json()})
 
@@ -132,9 +130,7 @@ def show_room_users(room_id):
     '''
     Return jsonified users from room_id
     '''
-    # We only have one room; this is niiiiice
-    main_room = db.session.query(Room).get(room_id)
-    return jsonify({'users': main_room.users_as_json()})
+    return jsonify({'users': db.session.query(Room).get(room_id).users_as_json()})
 
 
 # Join a specific room with a given user
@@ -143,18 +139,14 @@ def create_room_users(room_id):
     '''
     Have a user join a room using the user_id in the POST data
     '''
-    # import pdb; pdb.set_trace()
-    # Can call curl with --data-binary and retrieve with request.data
-    # API test: curl --data "user_id=1" http://localhost:5001/messages
-    # print request.form
     main_room = db.session.query(Room).get(room_id)
-    # print main_room
     uid = int(request.form.get('user_id'))
-    # print data
-    # print type(uid), " uid: ", uid
     user = db.session.query(User).get(uid)
+    # Add the user to the room
     db.session.add(main_room.join_room(user))
     db.session.commit()
+    # Return the current list of users in the room; re-use the function we
+    # already have to do this
     return show_room_users(room_id)
 
 
@@ -188,12 +180,8 @@ def show_all_users():
     '''
     Return jsonified users
     '''
-    # users = User.query.all()
-    # serialize_str = ''
-    # for user in users:
-    #     serialize_str = repr(user.serialize()) + serialize_str
-    # print serialize_str
-    return jsonify({'users': [user.serialize() for user in User.query.all()]})
+
+    return jsonify({'users': [user.as_json() for user in User.query.all()]})
 
 
 # Create a user

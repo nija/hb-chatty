@@ -1,44 +1,57 @@
-"use strict";
+// "use strict";
+// $(document).ready(function(){
+//     // Load the chat messages
+//     firstLoadOfChat();
 
-// Define the success function aka callback
-function loadMessagesOnPageLoad(results) {
-    // Define a return string
-    var history = "Test<br>";
-    // for every object in the results list
-    var messages = results.messages;
-    // console.log("length: " + messages.length);
-    // console.log("messages: " + messages);
-    // var dataArray = [{"id":28,"class":"Sweden"}, {"id":56,"class":"USA"}, {"id":89,"class":"England"}];
-    // debugger;
-    for (var i = 0; i < messages.length; i++) { 
-        // var userName = $('#username').val()
-        // history += userName + ": " + messages[i].data + "<br>";
-        history += messages[i].created_at + " &nbsp;&nbsp; " + messages[i].user_name + ": " + messages[i].data + "<br>";
-        //
-    };
- 
-    // $(jQuery.parseJSON(JSON.stringify(messages)))
-    // $(jQuery.parseJSON(messages))
 
-    // $(jQuery.parseJSON(JSON.stringify(dataArray))).each(function() {  
-    //      var ID = this.id;
-    //      var CLASS = this.class;
-    // });
-    // Pull out the results[iterator].data and results[iterator].user_id
-    // Call the server to get the user object from /api/user/user_id
-    // Add a <tr> user.name : results[iterator].data <tr> to the return string
+//     // Eventually, we want to use moments.js for the timestamp
 
-    // Replace the return string
-    $('#messageHistory').html(history);
+//     // Define the success function aka callback
+//     function loadMessages(results) {
+//         // Define a return string
+//         var history = '';
+//         var messages = results.messages;
+//         for (var i = 0; i < messages.length; i++) { 
+//             history += messages[i].created_at + " &nbsp;&nbsp; " + messages[i].user_name + ": " + messages[i].data + "<br>";
+//         };
+//         window.last_updated = messages[messages.length - 1].created_at
 
-    console.log("Finished replaceStatus");
-}
+//         // Replace the return string
+//         $('#messageHistory').html(history);
 
-// Define the event handler
-function firstLoadOfChat(evt) {
-    // AJAX call
-    $.getJSON("/api/rooms/1/messages",loadMessagesOnPageLoad);
-}
+//         console.log("Finished replaceStatus");
+//     }
 
-// Add the event handler to the click event for the button
-$(document).ready(firstLoadOfChat);
+//     // Define the event handler to handle the AJAX GET request
+//     function firstLoadOfChat(evt) {
+//         // AJAX call
+//         $.getJSON("/api/rooms/1/messages",loadMessages);
+//     }
+
+//     // Add the event handler to the on ready
+//     //$(document).ready(firstLoadOfChat);
+
+//     // =====================================================================
+
+//     // Define the event handler to handle the AJAX POST request
+//     function updateChat(evt) {
+//         var messageInput = {
+//             "data": $("#message_typing_box").val(),
+//             "user_id": 2 /*,
+//             "last_updated": 10*/
+//         };
+
+//         $('#message_typing_box').val('');
+//         // use the same callback function as the GET
+//         $.post('/api/rooms/1/messages', messageInput, loadMessages);
+//         // console.log("Finished sending AJAX for user_id " + messageInput.user_id + ": " + messageInput.data);
+//     }
+
+//     // Add the event handler to the click event for the button
+//     $('#message_typing_submit').click(updateChat);
+
+
+
+
+// });
+

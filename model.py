@@ -43,7 +43,7 @@ class Message(db.Model):
     '''
     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     data = db.Column(db.String(2048))
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     expiry_at = db.Column(db.DateTime)
     # Foreign keys
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
@@ -77,13 +77,13 @@ class Message(db.Model):
             'message_id': self.message_id,
             'data' : self.data,
             'created_at' : self.created_at.isoformat(),
-            # 'expiry_at' : self.expiry_at.isoformat(),
+            'expiry_at' : self.expiry_at.isoformat(),
             'user_id' : self.user_id,
             'user_name': self.user.name,
             'room_id' : self.room_id
         }
 
-    def return_as_json(self):
+    def as_json(self):
         '''
         Another way to call serialize; included for consistency
         '''
@@ -144,19 +144,18 @@ class User(db.Model):
             'created_at' : self.created_at
         }
 
-
     def as_json(self):
         return self.serialize()
 
     def messages_as_json(self):
         '''Return user messages as a JSON list
         '''
-        return [ msg.serialize() for msg in self.messages]
+        return [ msg.as_json() for msg in self.messages]
 
     def rooms_as_json(self):
         '''Return user's rooms as a JSON list
         '''
-        return [ room.serialize() for room in self.rooms]
+        return [ room.as_json() for room in self.rooms]
 
 
 class Room(db.Model):
@@ -212,16 +211,15 @@ class Room(db.Model):
         #"Created association: {}{}{} \n".format(joined, self, user)
         return to_delete
 
-
     def messages_as_json(self):
         '''Return room messages as a JSON list
         '''
-        return [ msg.serialize() for msg in self.messages]
+        return [ msg.as_json() for msg in self.messages]
 
     def users_as_json(self):
         '''Return room users as a JSON list
         '''
-        return [ msg.serialize() for msg in self.users]
+        return [ user.as_json() for user in self.users]
 
 
 class RoomUser(db.Model):
@@ -250,14 +248,23 @@ class RoomUser(db.Model):
         return '\n<{} room_user_id={} room_id="{}" user_id="{}" time_stamp={}>'.format(
             type(self).__name__, self.room_user_id, self.room_id, self.user_id, self.time_stamp)
 
+    def serialize(self):
+        '''Serialize this'''
+        return {
+            'room_user_id': self.room_user_id,
+            'room_id': self.room_id,
+            'user_id': self.user_id,
+            'time_stamp': self.time_stamp
+        }
 
 ##############################################################################
-# Helper functions
+# Helper functions & Data Model tests
 
 # Set up the app if necessary
 def seed_once(app):
     '''Create tables if none exist'''
     # Zomg, why did this take so long to figure out??
+    # Test to see if our message table exists
     query1 = """
     SELECT count(relname)
     FROM pg_class
@@ -265,34 +272,42 @@ def seed_once(app):
     """
     db_cursor = db.session.execute(query1)
     row = db_cursor.fetchone()
-    # Check to see if the table exists
+    # Check to see if the table exists; 0 means to recreate everything
     if row[0] == 0:
         #import pdb; pdb.set_trace()
-        print "\n\n\tCreating the world\n\n"
+        # print "\n\n\tCreating the world\n\n"
         db.create_all()
 
         # Create our default room
         main_room = Room(name='Main')
-        print main_room
-        print dir(main_room)
+        # print main_room
+        # print dir(main_room)
         db.session.add(main_room)
         db.session.commit()
         main_room = db.session.query(Room).get(1)
 
         # Create the system user
-        balloonicorn = User("Balloonicorn (System User)")
+        balloonicorn = User("Balloonicorn_Bot")
         db.session.add(balloonicorn)
         db.session.commit()
         balloonicorn = db.session.query(User).get(1)
 
-        # Add system user to room
-        db.session.add(main_room.join_room(balloonicorn))
+        # Create the default anonymous user
+        anonymouse = User("Anony Mouse")
+        db.session.add(anonymouse)
         db.session.commit()
-        print "\n\n\tOur world is complete!\n\n"
-        print balloonicorn, balloonicorn.rooms
+        anonymouse = db.session.query(User).get(2)
 
-    else:      
-        print "\n\n\tOur world EXISTS!\n\tnothing to do!\n\n"
+        # Add default users to room
+        db.session.add(main_room.join_room(balloonicorn))
+        db.session.add(main_room.join_room(anonymouse))
+        db.session.commit()
+        # print "\n\n\tOur world is complete!\n\n"
+        # print balloonicorn, balloonicorn.rooms
+
+    # else:      
+        # print "\n\n\tOur world EXISTS!\n\tnothing to do!\n\n"
+
 
 # Force a clean slate
 def seed_force(app):
@@ -334,7 +349,7 @@ def test_join_room(app):
     db.session.commit()
     print main_room.users
     #FIXME:
-    # assert fran in users
+    # assert fran in users # 
 
 def test_get_rooms(app):
     ''' '''
@@ -484,7 +499,7 @@ def connect_to_db(app, db_uri="postgresql:///ch"):
     '''
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_ECHO'] = True
+    # app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
 
@@ -498,9 +513,9 @@ if __name__ == '__main__':
     from server import app 
     #TODO: Janky testing function that needs to be turned into multiple asserts
     #      and put into tests.py
-    # test_example_data(app, db_uri="postgresql:///cha")
+    test_example_data(app, db_uri="postgresql:///ch")
     # test_seed_once(app, db_uri="postgresql:///ch")
-    connect_to_db(app, db_uri="postgresql:///ch")
+    #connect_to_db(app, db_uri="postgresql:///ch")
     print "Connected to DB."
 
 
