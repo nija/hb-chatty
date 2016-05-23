@@ -38,6 +38,7 @@ class ChatAPITests(unittest.TestCase):
     '''Integration tests for the API routes'''
 
     def setUp(self):
+        '''What to do before each test'''
         self.client = app.test_client()
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'BalloonicornSmash'
@@ -47,6 +48,7 @@ class ChatAPITests(unittest.TestCase):
         seed_force(app)
 
     def tearDown(self):
+        '''What to do after each test'''
         pass
 
 
@@ -72,8 +74,61 @@ class ChatAPITests(unittest.TestCase):
         self.assertIn('"name": "{}",'.format(new_room.name), result.data)
         self.assertIn('"room_id": {}'.format(new_room.room_id), result.data)
 
+    def test_show_room_message(self):
+        '''Test GET server.show_room_messages'''
+        room_name = "lalala"
+        room_msg1 = 'What a happy penguin am I!'
+        room_msg2 = "It's practically impossible to look at a penguin and feel angry."
+        user_name = 'Penny Penguin'
+        # Create a room
+        new_room = Room(name=room_name)
+        db.session.add(new_room)
+        db.session.commit()
+        # Create a user
+        penny_penguin = User(user_name)
+        db.session.add(penny_penguin)
+        db.session.commit()
+        # Add the user to the room
+        new_room = Room.query.filter(Room.name == room_name).first()
+        penny_penguin = User.query.filter(User.name == user_name).first()
+        balloonicorn = User.query.get(1)
+        anonymouse = User.query.get(2)
+        print type(balloonicorn), balloonicorn
+        print type(anonymouse), anonymouse
+        #db.session.add(main_room.join_room(anonymouse))
+        db.session.add(new_room.join_room(penny_penguin))
+        db.session.add(new_room.join_room(balloonicorn))
+        db.session.add(new_room.join_room(anonymouse))
+        db.session.commit()
+        # Have the user say something in the room
+        #result = self.client.get('/api/rooms/{}'.format(int(new_room.room_id)))
+        result1 = self.client.post(
+            '/api/rooms/{}/messages'.format(int(new_room.room_id)),
+             data = {
+                'data': room_msg1,
+                'user_id': penny_penguin.user_id
+                })
+        print "Result 1: \n", result1.data
+        result2 = self.client.post(
+            '/api/rooms/{}/messages'.format(int(new_room.room_id)),
+             data = {
+                'data': room_msg2,
+                'user_id': penny_penguin.user_id
+                })
+        print "Result 2: \n", result2.data
+        result3 = self.client.get(
+            '/api/rooms/{}/messages'.format(int(new_room.room_id)))
+        print "Result 3: \n", result3.data
+        jason = json.loads(result3.data)
+        msg_list = jason["messages"]
+        self.assertIn(penny_penguin.name, result3.data)
+        self.assertIn(room_msg1, result3.data)
+        self.assertIn(room_msg2, result3.data)
+        self.assertEqual(len(msg_list), 2)
+
+
     def test_create_room_message(self):
-        '''Test server.show_room_messages'''
+        '''Test POST server.show_room_messages'''
         room_name = "lalala"
         room_msg = 'What a happy penguin!'
         user_name = 'Linux'
@@ -128,6 +183,11 @@ class ChatWebTests(unittest.TestCase):
     def test_home_page(self):
         '''Checking the root route'''
         result = self.client.get("/")
+        self.assertEqual(result.status_code, 200)
+
+    def test_path_to_favicon(self):
+        '''Checking the root route'''
+        result = self.client.get("/favicon.ico")
         self.assertEqual(result.status_code, 200)
 
     # def test_rsvp(self):
