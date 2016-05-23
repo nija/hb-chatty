@@ -29,6 +29,7 @@ app.jinja_env.undefined = StrictUndefined
 
 # ====== Routes Definitions ======
 
+######  Flask Routes  ######
 # Show homepage
 @app.route('/')
 def index():
@@ -42,7 +43,7 @@ def serve_favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/img'), 'favicon.ico')
                                #'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-######  API calls  ######
+######  API Routes  ######
 
 # Get the list of all rooms
 @app.route('/api/rooms', methods=["GET"])

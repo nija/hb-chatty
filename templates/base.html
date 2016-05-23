@@ -4,7 +4,7 @@
   <title> Chatty : {% block title %} TITLE HERE {% endblock %}</title>
   <!-- Load JQuery -->
   <script type="text/javascript"
-        src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+        src="http://code.jquery.com/jquery.js"></script>
   <!-- Load Bootstrap -->
   <link rel="stylesheet" 
         type='text/css'
@@ -18,16 +18,15 @@
   <!-- Load my custom CSS -->
   <link rel="stylesheet"
         type="text/css"
-        href="../static/css/chatty.css">
+        href="/static/css/chatty.css">
   <!-- Load my custom javascript -->
-  <script type="text/javascript" src="/static/js/loadChat.js"></script>
   <script type="text/javascript" src="/static/js/chatty.js"></script>
 
 </head>
 <body>
 <div class="container">
-  <h1>
-    <a href="/"><center>Balloonicorn's Land of Milk and Honey</center></a>
+  <h1 align="center">
+    <a href="/">Balloonicorn's Land of Milk and Honey</a>
   </h1>
   {% for msg in get_flashed_messages() %}
     <div class="alert alert-info">{{ msg }}</div>
