@@ -5,6 +5,8 @@ import json
 from server import app
 from model import MyJSONEncoder, Message, User, Room, RoomUser, db, connect_to_db, seed_once, seed_force
 
+
+travis_db_uri="postgresql:///travis_ci_test"
 # class ChatModelTests(unittest.TestCase):
 #     '''Tests for the data model and ORM'''
 
@@ -40,7 +42,7 @@ class ChatAPITests(unittest.TestCase):
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'BalloonicornSmash'
         # Connect to the database
-        connect_to_db(app, db_uri="postgresql:///travis_ci_test")
+        connect_to_db(app, db_uri=travis_db_uri)
         # Reset the world so we start with clean data
         seed_force(app)
 
@@ -119,7 +121,7 @@ class ChatWebTests(unittest.TestCase):
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'BalloonicornSmash'
         # Connect to the database
-        connect_to_db(app, db_uri="postgresql:///cha")
+        connect_to_db(app, db_uri=travis_db_uri)
         # Reset the world so we start with clean data
         seed_force(app)
 
