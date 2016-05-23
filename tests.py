@@ -40,7 +40,7 @@ class ChatAPITests(unittest.TestCase):
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'BalloonicornSmash'
         # Connect to the database
-        connect_to_db(app, db_uri="postgresql:///cha")
+        connect_to_db(app, db_uri="postgresql:///travis_ci_test")
         # Reset the world so we start with clean data
         seed_force(app)
 
