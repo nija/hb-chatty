@@ -1,6 +1,7 @@
 '''Tests for chatty'''
 import unittest
 import doctest
+import json
 from server import app
 from model import MyJSONEncoder, Message, User, Room, RoomUser, db, connect_to_db, seed_once, seed_force
 
@@ -69,7 +70,7 @@ class ChatAPITests(unittest.TestCase):
         self.assertIn('"name": "{}",'.format(new_room.name), result.data)
         self.assertIn('"room_id": {}'.format(new_room.room_id), result.data)
 
-    def test_create_room_messages(self):
+    def test_create_room_message(self):
         '''Test server.show_room_messages'''
         room_name = "lalala"
         room_msg = 'What a happy penguin!'
@@ -96,8 +97,17 @@ class ChatAPITests(unittest.TestCase):
                 'data': room_msg,
                 'user_id': new_user.user_id
                 })
+        jason = json.loads(result.data)
+        msg_list = jason["messages"]
         self.assertIn(new_user.name, result.data)
         self.assertIn(room_msg, result.data)
+        self.assertEqual(len(msg_list), 1)
+
+
+
+
+
+
 
 
 
