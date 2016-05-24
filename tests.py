@@ -2,6 +2,7 @@
 import unittest
 import doctest
 import json
+from datetime import datetime
 from server import app
 from model import MyJSONEncoder, Message, User, Room, RoomUser, db, connect_to_db, seed_once, seed_force
 
@@ -75,7 +76,12 @@ class ChatAPITests(unittest.TestCase):
         self.assertIn('"room_id": {}'.format(new_room.room_id), result.data)
 
     def test_show_room_message(self):
-        '''Test GET server.show_room_messages'''
+        '''Test GET server.show_room_messages for all four path options.
+        /api/rooms/<int:room_id>/messages
+        /api/rooms/<int:room_id>/messages?last_updated=<datetime:last_updated>
+        /api/rooms/<int:room_id>/messages?limit_responses=<int:limit_responses>
+        /api/rooms/<int:room_id>/messages?last_updated=<datetime:last_updated>&limit_responses=<int:limit_responses>
+        '''
         # Background Context: 
         # Flask's app.test_client normally resets the session scope
         # upon every call to the test_client. Model objects are bound to the
@@ -136,6 +142,9 @@ class ChatAPITests(unittest.TestCase):
             # balloonicorn = db.session.merge(balloonicorn)
             # new_room = db.session.merge(new_room)
 
+            #FIXME: Make this a proper datestamp
+            # time_stamp = datetime.now().strftime()
+            # import pdb; pdb.set_trace()
             #FIXME: Why can't I post with Balloonicorn or Anonymouse?
             result_post_2 = test_client.post(
                 '/api/rooms/{}/messages'.format(int(new_room.room_id)),
@@ -165,6 +174,7 @@ class ChatAPITests(unittest.TestCase):
             result_get_3 = test_client.get(
                 '/api/rooms/{}/messages'.format(int(new_room.room_id)))
             # print "Result GET 3: \n", result_get_3.data
+
             # time_stamp = datetime.timestamp()  #FIXME: get this into unix time?
             # result4 = self.client.get(
             #     '/api/rooms/{}/messages?last_updated={}'.format(int(new_room.room_id),time_stamp))
@@ -221,9 +231,78 @@ class ChatAPITests(unittest.TestCase):
         # gets recreated before and after each test
         self.assertEqual(len(msg_list), 1)
 
+    def test_show_room_users(self):
+        '''Test GET server.show_room_users'''
+        with self.client as test_client:
+            room_name = "tesseract"
+            user_name = 'Penny Penguin'
+
+            # Create a room
+            new_room = Room(name=room_name)
+            db.session.add(new_room)
+            db.session.commit()
+
+            # Create a user
+            penny_penguin = User(user_name)
+            db.session.add(penny_penguin)
+            db.session.commit()
+
+            # Add the user to the room
+            new_room = Room.query.filter(Room.name == room_name).first()
+            penny_penguin = User.query.filter(User.name == user_name).first()
+            balloonicorn = User.query.get(1)
+            anonymouse = User.query.get(2)
+
+            # print type(balloonicorn), balloonicorn, balloonicorn.user_id
+            # print type(anonymouse), anonymouse, anonymouse.user_id
+            #db.session.add(main_room.join_room(anonymouse))
+            db.session.add(new_room.join_room(penny_penguin))
+            db.session.add(new_room.join_room(balloonicorn))
+            db.session.add(new_room.join_room(anonymouse))
+            db.session.commit()
 
 
+            result = test_client.get('/api/rooms/{}/users'.format(int(new_room.room_id)))
+            # print "rooms and users:\n", result.data
+            self.assertIn('"name": "{}",'.format(penny_penguin.name), result.data)
 
+    def test_create_room_users(self):
+        '''Test POST server.show_room_users'''
+
+        with self.client as test_client:
+            room_name = "tesseract"
+            user_name = 'Penny Penguin'
+
+            # Create a room
+            new_room = Room(name=room_name)
+            db.session.add(new_room)
+            db.session.commit()
+
+            # Create a user
+            penny_penguin = User(user_name)
+            db.session.add(penny_penguin)
+            db.session.commit()
+
+            # Add the user to the room
+            new_room = Room.query.filter(Room.name == room_name).first()
+            penny_penguin = User.query.filter(User.name == user_name).first()
+
+            result_post_1 = test_client.post(
+                '/api/rooms/{}/users'.format(int(new_room.room_id)),
+                 data = {
+                    'user_id': penny_penguin.user_id
+                    })
+            print "result_post_1:\n", result_post_1.data
+            self.assertIn('"name": "{}",'.format(penny_penguin.name), result_post_1.data)
+
+    def test_show_all_users(self):
+        '''Test server.show_all_rooms()'''
+        # Create a user
+        penny_penguin = User('Penny Penguin')
+        db.session.add(penny_penguin)
+        db.session.commit()
+        result = self.client.get('/api/users')
+        self.assertIn('"name": "{}",'.format(penny_penguin.name), result.data)
 
 
 
