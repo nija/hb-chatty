@@ -75,7 +75,7 @@ def show_room_messages(room_id):
     # Set room_msgs to be the time range or the limit of the number of messages
     if last_updated:
         dt_last_updated = datetime.fromtimestamp(int(last_updated))
-        print type(dt_last_updated), dt_last_updated
+        # print type(dt_last_updated), dt_last_updated
         room_msgs = db.session.query(Message).filter(
             Message.room_id == room.room_id,
             Message.created_at > dt_last_updated).order_by(
@@ -109,6 +109,7 @@ def create_room_message(room_id):
     # Can call curl with --data-binary and retrieve with request.data
     # API test: curl --data "data=Hi, I am Sally&user_id=3" http://localhost:5001/api/rooms/1/messages
     # print request.form
+
     main_room = db.session.query(Room).get(room_id)
     data = request.form.get('data')
     uid = int(request.form.get('user_id'))

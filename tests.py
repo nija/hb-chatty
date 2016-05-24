@@ -79,7 +79,9 @@ class ChatAPITests(unittest.TestCase):
         room_name = "lalala"
         room_msg1 = 'What a happy penguin am I!'
         room_msg2 = "It's practically impossible to look at a penguin and feel angry."
+        room_msg3 = 'Burn Everything'
         user_name = 'Penny Penguin'
+
         # Create a room
         new_room = Room(name=room_name)
         db.session.add(new_room)
@@ -93,37 +95,72 @@ class ChatAPITests(unittest.TestCase):
         penny_penguin = User.query.filter(User.name == user_name).first()
         balloonicorn = User.query.get(1)
         anonymouse = User.query.get(2)
-        print type(balloonicorn), balloonicorn
-        print type(anonymouse), anonymouse
+        # print type(balloonicorn), balloonicorn, balloonicorn.user_id
+        # print type(anonymouse), anonymouse, anonymouse.user_id
         #db.session.add(main_room.join_room(anonymouse))
         db.session.add(new_room.join_room(penny_penguin))
         db.session.add(new_room.join_room(balloonicorn))
         db.session.add(new_room.join_room(anonymouse))
         db.session.commit()
+        print type(balloonicorn), balloonicorn, balloonicorn.user_id
+        print type(anonymouse), anonymouse, anonymouse.user_id
         # Have the user say something in the room
         #result = self.client.get('/api/rooms/{}'.format(int(new_room.room_id)))
-        result1 = self.client.post(
+        # import pdb; pdb.set_trace()
+        result_post_1 = self.client.post(
             '/api/rooms/{}/messages'.format(int(new_room.room_id)),
              data = {
                 'data': room_msg1,
-                'user_id': penny_penguin.user_id
+                'user_id': anonymouse.user_id
                 })
-        print "Result 1: \n", result1.data
-        result2 = self.client.post(
+        print "Result POST 1: \n", result_post_1.data
+        penny_penguin = db.session.merge(penny_penguin)
+        anonymouse = db.session.merge(anonymouse)
+        balloonicorn = db.session.merge(balloonicorn)
+        new_room = db.session.merge(new_room)
+        #FIXME: Why can't I post with Balloonicorn or Anonymouse?
+        result_post_2 = self.client.post(
             '/api/rooms/{}/messages'.format(int(new_room.room_id)),
              data = {
                 'data': room_msg2,
                 'user_id': penny_penguin.user_id
                 })
-        print "Result 2: \n", result2.data
-        result3 = self.client.get(
+        print "Result POST 2: \n", result_post_2.data
+        penny_penguin = db.session.merge(penny_penguin)
+        anonymouse = db.session.merge(anonymouse)
+        balloonicorn = db.session.merge(balloonicorn)
+        new_room = db.session.merge(new_room)
+
+        result_post_3 = self.client.post(
+            '/api/rooms/{}/messages'.format(int(new_room.room_id)),
+             data = {
+                'data': room_msg3,
+                'user_id': balloonicorn.user_id
+                })
+        print "Result POST 3: \n", result_post_3.data
+        penny_penguin = db.session.merge(penny_penguin)
+        anonymouse = db.session.merge(anonymouse)
+        balloonicorn = db.session.merge(balloonicorn)
+        new_room = db.session.merge(new_room)
+
+        result_get_3 = self.client.get(
             '/api/rooms/{}/messages'.format(int(new_room.room_id)))
-        print "Result 3: \n", result3.data
-        jason = json.loads(result3.data)
+        print "Result GET 3: \n", result_get_3.data
+        # time_stamp = datetime.timestamp()  #FIXME: get this into unix time?
+        # result4 = self.client.get(
+        #     '/api/rooms/{}/messages?last_updated={}'.format(int(new_room.room_id),time_stamp))
+        # print "Result 4: \n", result4.data
+
+        penny_penguin = db.session.merge(penny_penguin)
+        anonymouse = db.session.merge(anonymouse)
+        balloonicorn = db.session.merge(balloonicorn)
+        new_room = db.session.merge(new_room)
+
+        jason = json.loads(result_get_3.data)
         msg_list = jason["messages"]
-        self.assertIn(penny_penguin.name, result3.data)
-        self.assertIn(room_msg1, result3.data)
-        self.assertIn(room_msg2, result3.data)
+        self.assertIn(penny_penguin.name, result_get_3.data)
+        self.assertIn(room_msg1, result_get_3.data)
+        self.assertIn(room_msg2, result_get_3.data)
         self.assertEqual(len(msg_list), 2)
 
 
