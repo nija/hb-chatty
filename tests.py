@@ -86,15 +86,18 @@ class ChatAPITests(unittest.TestCase):
         new_room = Room(name=room_name)
         db.session.add(new_room)
         db.session.commit()
+
         # Create a user
         penny_penguin = User(user_name)
         db.session.add(penny_penguin)
         db.session.commit()
+
         # Add the user to the room
         new_room = Room.query.filter(Room.name == room_name).first()
         penny_penguin = User.query.filter(User.name == user_name).first()
         balloonicorn = User.query.get(1)
         anonymouse = User.query.get(2)
+
         # print type(balloonicorn), balloonicorn, balloonicorn.user_id
         # print type(anonymouse), anonymouse, anonymouse.user_id
         #db.session.add(main_room.join_room(anonymouse))
@@ -102,11 +105,14 @@ class ChatAPITests(unittest.TestCase):
         db.session.add(new_room.join_room(balloonicorn))
         db.session.add(new_room.join_room(anonymouse))
         db.session.commit()
+
         print type(balloonicorn), balloonicorn, balloonicorn.user_id
         print type(anonymouse), anonymouse, anonymouse.user_id
+
         # Have the user say something in the room
         #result = self.client.get('/api/rooms/{}'.format(int(new_room.room_id)))
         # import pdb; pdb.set_trace()
+
         result_post_1 = self.client.post(
             '/api/rooms/{}/messages'.format(int(new_room.room_id)),
              data = {
@@ -114,10 +120,11 @@ class ChatAPITests(unittest.TestCase):
                 'user_id': anonymouse.user_id
                 })
         print "Result POST 1: \n", result_post_1.data
-        penny_penguin = db.session.merge(penny_penguin)
-        anonymouse = db.session.merge(anonymouse)
-        balloonicorn = db.session.merge(balloonicorn)
-        new_room = db.session.merge(new_room)
+        # penny_penguin = db.session.merge(penny_penguin)
+        # anonymouse = db.session.merge(anonymouse)
+        # balloonicorn = db.session.merge(balloonicorn)
+        # new_room = db.session.merge(new_room)
+
         #FIXME: Why can't I post with Balloonicorn or Anonymouse?
         result_post_2 = self.client.post(
             '/api/rooms/{}/messages'.format(int(new_room.room_id)),
@@ -159,6 +166,7 @@ class ChatAPITests(unittest.TestCase):
 
         jason = json.loads(result_get_3.data)
         msg_list = jason["messages"]
+        
         self.assertIn(penny_penguin.name, result_get_3.data)
         self.assertIn(room_msg1, result_get_3.data)
         self.assertIn(room_msg2, result_get_3.data)

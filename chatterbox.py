@@ -1,4 +1,4 @@
-
+'''Artisinal chat bot'''
 
 class Chattybot(object):
     """Docstring for Chatterbox"""
@@ -21,4 +21,4 @@ class Chattybot(object):
 if __name__ == "__main__":
     '''polling occurs here'''
     chatty = Chattybot("chatter", "http://localhost:5001")
-    
+
