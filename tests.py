@@ -76,10 +76,118 @@ class ChatAPITests(unittest.TestCase):
 
     def test_show_room_message(self):
         '''Test GET server.show_room_messages'''
+        # Background Context: 
+        # Flask's app.test_client normally resets the session scope
+        # upon every call to the test_client. Model objects are bound to the
+        # session. Because each call to the test_client ends the scope of a
+        # session, all the Model objects become detached and difficult to work
+        # with.
+        # To solve this, we explicitly set the scope as shared so we can issue
+        # multiple calls to test_client without having to re-bind our objects
+        # to each new session. That's the whole purpose of this next line.
+        # Note: There's still something strange going on with session scoping
+        with self.client as test_client:
+            room_name = "lalala"
+            room_msg1 = 'What a happy penguin am I!'
+            room_msg2 = "It's practically impossible to look at a penguin and feel angry."
+            room_msg3 = 'Burn everything'
+            user_name = 'Penny Penguin'
+
+            # Create a room
+            new_room = Room(name=room_name)
+            db.session.add(new_room)
+            db.session.commit()
+
+            # Create a user
+            penny_penguin = User(user_name)
+            db.session.add(penny_penguin)
+            db.session.commit()
+
+            # Add the user to the room
+            new_room = Room.query.filter(Room.name == room_name).first()
+            penny_penguin = User.query.filter(User.name == user_name).first()
+            balloonicorn = User.query.get(1)
+            anonymouse = User.query.get(2)
+
+            # print type(balloonicorn), balloonicorn, balloonicorn.user_id
+            # print type(anonymouse), anonymouse, anonymouse.user_id
+            #db.session.add(main_room.join_room(anonymouse))
+            db.session.add(new_room.join_room(penny_penguin))
+            db.session.add(new_room.join_room(balloonicorn))
+            db.session.add(new_room.join_room(anonymouse))
+            db.session.commit()
+
+            # print type(balloonicorn), balloonicorn, balloonicorn.user_id
+            # print type(anonymouse), anonymouse, anonymouse.user_id
+
+            # Have the user say something in the room
+            #result = self.client.get('/api/rooms/{}'.format(int(new_room.room_id)))
+            # import pdb; pdb.set_trace()
+
+            result_post_1 = test_client.post(
+                '/api/rooms/{}/messages'.format(int(new_room.room_id)),
+                 data = {
+                    'data': room_msg1,
+                    'user_id': anonymouse.user_id
+                    })
+            # print "Result POST 1: \n", result_post_1.data
+            # penny_penguin = db.session.merge(penny_penguin)
+            # anonymouse = db.session.merge(anonymouse)
+            # balloonicorn = db.session.merge(balloonicorn)
+            # new_room = db.session.merge(new_room)
+
+            #FIXME: Why can't I post with Balloonicorn or Anonymouse?
+            result_post_2 = test_client.post(
+                '/api/rooms/{}/messages'.format(int(new_room.room_id)),
+                 data = {
+                    'data': room_msg2,
+                    'user_id': penny_penguin.user_id
+                    })
+            # print "Result POST 2: \n", result_post_2.data
+            # penny_penguin = db.session.merge(penny_penguin)
+            # anonymouse = db.session.merge(anonymouse)
+            balloonicorn = db.session.merge(balloonicorn)
+            # new_room = db.session.merge(new_room)
+
+            result_post_3 = test_client.post(
+                '/api/rooms/{}/messages'.format(int(new_room.room_id)),
+                 data = {
+                    'data': room_msg3,
+                    'user_id': balloonicorn.user_id
+                    })
+            # print "Result POST 3: \n", result_post_3.data
+            # penny_penguin = db.session.merge(penny_penguin)
+            # anonymouse = db.session.merge(anonymouse)
+            # balloonicorn = db.session.merge(balloonicorn)
+            # new_room = db.session.merge(new_room)
+
+            # import pdb; pdb.set_trace()
+            result_get_3 = test_client.get(
+                '/api/rooms/{}/messages'.format(int(new_room.room_id)))
+            # print "Result GET 3: \n", result_get_3.data
+            # time_stamp = datetime.timestamp()  #FIXME: get this into unix time?
+            # result4 = self.client.get(
+            #     '/api/rooms/{}/messages?last_updated={}'.format(int(new_room.room_id),time_stamp))
+            # print "Result 4: \n", result4.data
+
+            # penny_penguin = db.session.merge(penny_penguin)
+            # anonymouse = db.session.merge(anonymouse)
+            # balloonicorn = db.session.merge(balloonicorn)
+            # new_room = db.session.merge(new_room)
+
+            jason = json.loads(result_get_3.data)
+            msg_list = jason["messages"]
+
+            self.assertIn(penny_penguin.name, result_get_3.data)
+            self.assertIn(room_msg1, result_get_3.data)
+            self.assertIn(room_msg2, result_get_3.data)
+            self.assertEqual(len(msg_list), 3)
+
+
+    def test_create_room_message(self):
+        '''Test POST server.show_room_messages'''
         room_name = "lalala"
-        room_msg1 = 'What a happy penguin am I!'
-        room_msg2 = "It's practically impossible to look at a penguin and feel angry."
-        room_msg3 = 'Burn Everything'
+        room_msg = 'What a happy penguin!'
         user_name = 'Penny Penguin'
 
         # Create a room
@@ -88,112 +196,17 @@ class ChatAPITests(unittest.TestCase):
         db.session.commit()
 
         # Create a user
-        penny_penguin = User(user_name)
-        db.session.add(penny_penguin)
-        db.session.commit()
-
-        # Add the user to the room
-        new_room = Room.query.filter(Room.name == room_name).first()
-        penny_penguin = User.query.filter(User.name == user_name).first()
-        balloonicorn = User.query.get(1)
-        anonymouse = User.query.get(2)
-
-        # print type(balloonicorn), balloonicorn, balloonicorn.user_id
-        # print type(anonymouse), anonymouse, anonymouse.user_id
-        #db.session.add(main_room.join_room(anonymouse))
-        db.session.add(new_room.join_room(penny_penguin))
-        db.session.add(new_room.join_room(balloonicorn))
-        db.session.add(new_room.join_room(anonymouse))
-        db.session.commit()
-
-        print type(balloonicorn), balloonicorn, balloonicorn.user_id
-        print type(anonymouse), anonymouse, anonymouse.user_id
-
-        # Have the user say something in the room
-        #result = self.client.get('/api/rooms/{}'.format(int(new_room.room_id)))
-        # import pdb; pdb.set_trace()
-
-        result_post_1 = self.client.post(
-            '/api/rooms/{}/messages'.format(int(new_room.room_id)),
-             data = {
-                'data': room_msg1,
-                'user_id': anonymouse.user_id
-                })
-        print "Result POST 1: \n", result_post_1.data
-        # penny_penguin = db.session.merge(penny_penguin)
-        # anonymouse = db.session.merge(anonymouse)
-        # balloonicorn = db.session.merge(balloonicorn)
-        # new_room = db.session.merge(new_room)
-
-        #FIXME: Why can't I post with Balloonicorn or Anonymouse?
-        result_post_2 = self.client.post(
-            '/api/rooms/{}/messages'.format(int(new_room.room_id)),
-             data = {
-                'data': room_msg2,
-                'user_id': penny_penguin.user_id
-                })
-        print "Result POST 2: \n", result_post_2.data
-        penny_penguin = db.session.merge(penny_penguin)
-        anonymouse = db.session.merge(anonymouse)
-        balloonicorn = db.session.merge(balloonicorn)
-        new_room = db.session.merge(new_room)
-
-        result_post_3 = self.client.post(
-            '/api/rooms/{}/messages'.format(int(new_room.room_id)),
-             data = {
-                'data': room_msg3,
-                'user_id': balloonicorn.user_id
-                })
-        print "Result POST 3: \n", result_post_3.data
-        penny_penguin = db.session.merge(penny_penguin)
-        anonymouse = db.session.merge(anonymouse)
-        balloonicorn = db.session.merge(balloonicorn)
-        new_room = db.session.merge(new_room)
-
-        import pdb; pdb.set_trace()
-        result_get_3 = self.client.get(
-            '/api/rooms/{}/messages'.format(int(new_room.room_id)))
-        print "Result GET 3: \n", result_get_3.data
-        # time_stamp = datetime.timestamp()  #FIXME: get this into unix time?
-        # result4 = self.client.get(
-        #     '/api/rooms/{}/messages?last_updated={}'.format(int(new_room.room_id),time_stamp))
-        # print "Result 4: \n", result4.data
-
-        penny_penguin = db.session.merge(penny_penguin)
-        anonymouse = db.session.merge(anonymouse)
-        balloonicorn = db.session.merge(balloonicorn)
-        new_room = db.session.merge(new_room)
-
-        jason = json.loads(result_get_3.data)
-        msg_list = jason["messages"]
-        
-        self.assertIn(penny_penguin.name, result_get_3.data)
-        self.assertIn(room_msg1, result_get_3.data)
-        self.assertIn(room_msg2, result_get_3.data)
-        self.assertEqual(len(msg_list), 2)
-
-
-    def test_create_room_message(self):
-        '''Test POST server.show_room_messages'''
-        room_name = "lalala"
-        room_msg = 'What a happy penguin!'
-        user_name = 'Linux'
-        # Create a room
-        new_room = Room(name=room_name)
-        db.session.add(new_room)
-        db.session.commit()
-        # Create a user
         new_user = User(user_name)
         db.session.add(new_user)
         db.session.commit()
+
         # Add the user to the room
         new_room = Room.query.filter(Room.name == room_name).first()
         new_user = User.query.filter(User.name == user_name).first()
-        #db.session.add(main_room.join_room(anonymouse))
         db.session.add(new_room.join_room(new_user))
         db.session.commit()
+
         # Have the user say something in the room
-        #result = self.client.get('/api/rooms/{}'.format(int(new_room.room_id)))
         result = self.client.post(
             '/api/rooms/{}/messages'.format(int(new_room.room_id)),
              data = {
@@ -204,6 +217,8 @@ class ChatAPITests(unittest.TestCase):
         msg_list = jason["messages"]
         self.assertIn(new_user.name, result.data)
         self.assertIn(room_msg, result.data)
+        # We know there should only be one message because everything
+        # gets recreated before and after each test
         self.assertEqual(len(msg_list), 1)
 
 
