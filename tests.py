@@ -143,6 +143,7 @@ class ChatAPITests(unittest.TestCase):
         balloonicorn = db.session.merge(balloonicorn)
         new_room = db.session.merge(new_room)
 
+        import pdb; pdb.set_trace()
         result_get_3 = self.client.get(
             '/api/rooms/{}/messages'.format(int(new_room.room_id)))
         print "Result GET 3: \n", result_get_3.data
