@@ -43,6 +43,7 @@ class ChatAPITests(unittest.TestCase):
         self.client = app.test_client()
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'BalloonicornSmash'
+        # app.config['SQLALCHEMY_ECHO'] = True
         # Connect to the database
         connect_to_db(app, db_uri=travis_db_uri)
         # Reset the world so we start with clean data
@@ -92,7 +93,9 @@ class ChatAPITests(unittest.TestCase):
         # multiple calls to test_client without having to re-bind our objects
         # to each new session. That's the whole purpose of this next line.
         # Note: There's still something strange going on with session scoping
+        
         with self.client as test_client:
+        # if True:
             room_name = "lalala"
             room_msg1 = 'What a happy penguin am I!'
             room_msg2 = "It's practically impossible to look at a penguin and feel angry."
@@ -110,8 +113,8 @@ class ChatAPITests(unittest.TestCase):
             db.session.commit()
 
             # Add the user to the room
-            new_room = Room.query.filter(Room.name == room_name).first()
-            penny_penguin = User.query.filter(User.name == user_name).first()
+            # new_room = Room.query.filter(Room.name == room_name).first()
+            # penny_penguin = User.query.filter(User.name == user_name).first()
             balloonicorn = User.query.get(1)
             anonymouse = User.query.get(2)
 
@@ -123,6 +126,8 @@ class ChatAPITests(unittest.TestCase):
             db.session.add(new_room.join_room(anonymouse))
             db.session.commit()
 
+            # import pdb; pdb.set_trace()
+
             # print type(balloonicorn), balloonicorn, balloonicorn.user_id
             # print type(anonymouse), anonymouse, anonymouse.user_id
 
@@ -130,12 +135,22 @@ class ChatAPITests(unittest.TestCase):
             #result = self.client.get('/api/rooms/{}'.format(int(new_room.room_id)))
             # import pdb; pdb.set_trace()
 
+
             result_post_1 = test_client.post(
+            # result_post_1 = self.client.post(
                 '/api/rooms/{}/messages'.format(int(new_room.room_id)),
                  data = {
                     'data': room_msg1,
                     'user_id': anonymouse.user_id
                     })
+
+            print "\n\n\nYO\n"
+            # import pdb; pdb.set_trace()
+            balloonicorn.name
+
+            # balloonicorn = db.session.merge(balloonicorn)
+            print "\n\n\n"
+
             # print "Result POST 1: \n", result_post_1.data
             # penny_penguin = db.session.merge(penny_penguin)
             # anonymouse = db.session.merge(anonymouse)
@@ -147,15 +162,19 @@ class ChatAPITests(unittest.TestCase):
             # import pdb; pdb.set_trace()
             #FIXME: Why can't I post with Balloonicorn or Anonymouse?
             result_post_2 = test_client.post(
+            # result_post_2 = self.client.post(
                 '/api/rooms/{}/messages'.format(int(new_room.room_id)),
                  data = {
                     'data': room_msg2,
                     'user_id': penny_penguin.user_id
                     })
+
+            # import pdb; pdb.set_trace()
+
             # print "Result POST 2: \n", result_post_2.data
             # penny_penguin = db.session.merge(penny_penguin)
             # anonymouse = db.session.merge(anonymouse)
-            balloonicorn = db.session.merge(balloonicorn)
+            # balloonicorn = db.session.merge(balloonicorn)
             # new_room = db.session.merge(new_room)
 
             result_post_3 = test_client.post(
@@ -164,6 +183,7 @@ class ChatAPITests(unittest.TestCase):
                     'data': room_msg3,
                     'user_id': balloonicorn.user_id
                     })
+
             # print "Result POST 3: \n", result_post_3.data
             # penny_penguin = db.session.merge(penny_penguin)
             # anonymouse = db.session.merge(anonymouse)

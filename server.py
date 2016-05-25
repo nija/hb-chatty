@@ -195,9 +195,11 @@ def create_user():
     user = User(name=name)
     db.session.add(user)
     db.session.commit()
-    users = User.query.order_by(User.created_at).all()
+    # users = User.query.order_by(User.created_at).all()
 
-    return jsonify(users[-1].as_json())
+    # return jsonify(users[-1].as_json())
+
+    return jsonify(user.as_json())
 
 # Get a specific user
 @app.route('/api/users/<int:user_id>', methods=["GET"])
@@ -215,7 +217,7 @@ if __name__ == "__main__":
 
     # Connect to the database
     # Test
-    #connect_to_db(app, db_uri="postgresql:///ch")
+    #connect_to_db(app, db_uri="postgresql:///travis_ci_test")
     connect_to_db(app)
     # Prod
     #connect_to_db(app, db_uri="postgresql:///chatty")

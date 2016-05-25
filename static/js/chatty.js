@@ -3,7 +3,7 @@ $(document).ready(function(){
     // Load the chat messages
     loadChat();
     // Start polling
-    setInterval(loadChat,500)
+    setInterval(loadChat,1000)
 
     // Eventually, we want to use moments.js for the timestamp
 
