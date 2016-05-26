@@ -41,7 +41,54 @@ def index():
 def serve_favicon():
     '''Serve our favicon'''
     return send_from_directory(os.path.join(app.root_path, 'static/img'), 'favicon.ico')
-                               #'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+@app.route('/ping')
+def serve_ping():
+    '''Serve a basic healthcheck'''
+    room=Room.query.get(1)
+
+    if room.name:
+        db_status = "DB reachable"
+    else:
+        db_status = "DB unreachable"
+
+    return render_template('ping.html',
+                           db_status=db_status)
+
+
+@app.route('/healthcheck')
+def serve_healthcheck():
+    '''Serve a monitoring healthcheck'''
+
+    room=Room.query.get(1)
+    if room.name:
+        db_status = "DB reachable"
+    else:
+        db_status = "DB unreachable"
+
+    app_name = '{}.{}'.format(app.name, app.import_name)
+    app_db = '{}'.format(app.config['SQLALCHEMY_DATABASE_URI'])
+    app_location = '{}'.format(app.root_path)
+    app_extensions = '{}'.format(app.extensions)
+    app_endpoints = '{}'.format(app.url_map._rules_by_endpoint)
+
+    num_rooms = len(Room.query.all())
+    num_users = len(User.query.all())
+
+    return render_template('healthcheck.html',
+                           db_status=db_status,
+                           app_name=app_name,
+                           app_db=app_db,
+                           app_location=app_location,
+                           app_extensions=app_extensions,
+                           app_endpoints=app_endpoints,
+                           num_rooms=num_rooms,
+                           num_users=num_users
+                           )
+    '''To force html to show the debug console:
+    host = {{ type(self).__name__ }}<br>
+    database = {{ app.database }}<br>'''
 
 ######  API Routes  ######
 

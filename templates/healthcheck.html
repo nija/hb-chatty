@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %} Monitoring healthcheck {% endblock %}
+
+{% block content %}
+<table class="infoTable">
+    <thead>
+        <tr>
+            <td><h3>Monitoring healthcheck for chat room microservice</h3></td>
+        </tr>
+    </thead>
+    <tr>
+        <td><span class='infoAttr'>number_of_rooms</span> = <span class='infoAttrValue'> {{ num_rooms }}</span></td>
+    </tr>
+    <tr>
+        <td><span class='infoAttr'>number_of_users</span> = <span class='infoAttrValue'> {{ num_users }}</span></td>
+    </tr>
+    <tr>
+        <td><span class='infoAttr'>app</span> = <span class='infoAttrValue'> {{ app_name }}</span></td>
+    </tr>
+    <tr>
+        <td><span class='infoAttr'>database</span> = <span class='infoAttrValue'> {{ app_db }}</span></td>
+    </tr>
+    <tr>
+        <td><span class='infoAttr'>location_on_server</span> = <span class='infoAttrValue'> {{ app_location }}</span></td>
+    </tr>
+    <tr>
+        <td><span class='infoAttr'>extensions</span> = <span class='infoAttrValue'> {{ app_extensions }}</span></td>
+    </tr>
+    <tr>
+        <td><span class='infoAttr'>url_map</span> = <span class='infoAttrValue'> {{ app_endpoints }}</span></td>
+    </tr>
+    <tr>
+        <td><span class='infoAttr'>&nbsp;</span></td>
+    </tr>
+</table>
+
+
+
+
+
+
+
+{% endblock %}

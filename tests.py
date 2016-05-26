@@ -159,8 +159,6 @@ class ChatAPITests(unittest.TestCase):
 
             #FIXME: Make this a proper datestamp
             # time_stamp = datetime.now().strftime()
-            # import pdb; pdb.set_trace()
-            #FIXME: Why can't I post with Balloonicorn or Anonymouse?
             result_post_2 = test_client.post(
             # result_post_2 = self.client.post(
                 '/api/rooms/{}/messages'.format(int(new_room.room_id)),

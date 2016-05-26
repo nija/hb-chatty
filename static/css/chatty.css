@@ -13,15 +13,59 @@ th {
     font-weight: normal;
 }
 
+h3 {
+	color: grey;
+	text-align: center;
+}
+
 .mainChatTable {
 	width: 80%;
 	border: none /*2px solid black*/;
 	background: rgba(255,255,255,0.3);
 	border-radius: 15px 100px 40px 5px;
+	margin-left: auto;
+	margin-right: auto;
 	padding: 15px; /*why does this not work? :( */
+}
+
+
+.infoTable {
+	margin-top: 5%;
+	margin-left: auto;
+	margin-right: auto;
+	width: 80%;
+	border: 2px solid grey;
+	background: rgba(255,255,255,0.3);
+	/*border-radius: 15px 100px 40px 5px;*/
+	padding: 15px;
+}
+
+.infoAttr {
+	font-weight: bold;
+	color: grey;
+}
+
+.infoAttrValue {
+	color: grey;
 }
 
 #messageHistory {
 	color: #295d5b;
 	font-weight: bold;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
