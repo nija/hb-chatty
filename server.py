@@ -229,7 +229,6 @@ def show_all_users():
     '''
     Return jsonified users
     '''
-
     return jsonify({'users': [user.as_json() for user in User.query.all()]})
 
 
@@ -254,6 +253,17 @@ def show_user(user_id):
     '''Return jsonified user from passed in user_id'''
     return jsonify(db.session.query(User).get(user_id).as_json())
 
+# Get a specific user's rooms
+@app.route('/api/users/<int:user_id>/rooms', methods=["GET"])
+def show_user_rooms(user_id):
+    '''Return jsonified user rooms from passed in user_id'''
+    return jsonify({'rooms': db.session.query(User).get(user_id).rooms_as_json()})
+
+# Get a specific user's messages
+@app.route('/api/users/<int:user_id>/messages', methods=["GET"])
+def show_user_messages(user_id):
+    '''Return jsonified user messages from passed in user_id'''
+    return jsonify({'messages': db.session.query(User).get(user_id).messages_as_json()})
 
 
 
