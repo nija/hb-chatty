@@ -1,17 +1,28 @@
 '''Chat Engine'''
 # pylint: disable=I0011,C0103
+
+# ====== Imports ======
+# Standard imports
 import os
 import bleach
 from datetime import datetime
+# Flask and related imports
 from jinja2 import StrictUndefined
 from flask import Flask, jsonify, render_template, redirect, request, flash, send_from_directory, session
 from flask_debugtoolbar import DebugToolbarExtension
+# Custom imports
+from bus import Bus
+from event import Event
+from listener import WeatherBot
 from model import Message, MyJSONEncoder, Room, User, connect_to_db, db, seed_once, seed_force
 
 # Log all the things
 #TODO: Add loggers
-import logging
-from logging.handlers import RotatingFileHandler
+# import logging
+# from logging.handlers import RotatingFileHandler
+
+
+
 
 
 # ====== Server Start-up ======
@@ -24,6 +35,12 @@ app.secret_key = 'BalloonicornSmash'
 # Normally, if you use an undefined variable in Jinja2, it fails silently.
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
+
+# Create bus and register listeners on the bus
+bus = Bus()
+weather_bot_name = 'Pyro'
+bus.register(WeatherBot(weather_bot_name), Event.Types.message_created_event)
+
 
 # ====== END Server Start-up ======
 
@@ -70,6 +87,7 @@ def serve_healthcheck():
     app_db = '{}'.format(app.config['SQLALCHEMY_DATABASE_URI'])
     app_location = '{}'.format(app.root_path)
     app_extensions = '{}'.format(app.extensions)
+    # Be rude and use a protected function
     app_endpoints = '{}'.format(app.url_map._rules_by_endpoint)
 
     num_rooms = len(Room.query.all())
@@ -146,7 +164,6 @@ def show_room_messages(room_id):
     return jsonify({"messages" : [msg.as_json() for msg in room_msgs[limit_responses:]]})
 
 # Post a message
-#TODO: Data sanitization
 @app.route('/api/rooms/<int:room_id>/messages', methods=["POST"])
 def create_room_message(room_id):
     '''Create a Message object from the POST data'''
@@ -164,6 +181,13 @@ def create_room_message(room_id):
     # Create the date fields using the database
     db.session.add(msg)
     db.session.commit()
+
+    # Put the event on the bus
+    print "Throwing message_created_event"
+    bus.notify(Event(
+        Event.Types.message_created_event, 
+        msg.as_json()))
+
 
     # To access the newly created object
     # msgs = Message.query.order_by(Message.message_id).all()
@@ -191,10 +215,18 @@ def create_room_users(room_id):
     # Add the user to the room
     db.session.add(main_room.join_room(user))
     db.session.commit()
+
+    # Put the event on the bus
+    print "Throwing user_joins_room"
+    bus.notify(Event(
+        Event.Types.user_joins_room, 
+        {   'user_id':user.user_id,
+            'user_name': user.name,
+            'room_id': room_id}))
+
     # Return the current list of users in the room; re-use the function we
     # already have to do this
     return show_room_users(room_id)
-
 
 # Leave a specific room with a given user
 #FIXME: This doesn't currently work
