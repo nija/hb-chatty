@@ -1,11 +1,11 @@
 import os
 import re
-from weather_api import WeatherApi
+from weather_api import WeatherAPI
 
 
 class Listener(object):
     """docstring for Listener"""
-    def __init__(self
+    def __init__(self):
         return
 
     def handle_event(self, event):
@@ -36,7 +36,7 @@ class WeatherBot(Listener):
                 self.do_weather(location)
         else:
             return
-    return
+        return
 
-    def do_weather(self.location):
-        WeatherApi.get_weather(api_key,location)
+    def do_weather(self, location):
+        WeatherApi.get_weather(self.api_key,location)
