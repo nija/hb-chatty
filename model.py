@@ -312,8 +312,11 @@ def seed_once(app):
 # Force a clean slate
 def seed_force(app):
     # Make sure nothing exists
+    # print 'dropping'
     db.drop_all()
+    # print 'seed once...'
     seed_once(app)
+    # print 'finished seed once'
 
 def test_seed_once(app, db_uri):
     '''Create example data for the test database.'''
@@ -347,9 +350,8 @@ def test_join_room(app):
     db.session.add(main_room.join_room(fran))
     # db.session.add(main_room.join_room(balloonicorn))
     db.session.commit()
-    print main_room.users
-    #FIXME:
-    # assert fran in users # 
+    # print main_room.users
+    #FIXME: assert fran in users
 
 def test_get_rooms(app):
     ''' '''
@@ -510,12 +512,12 @@ if __name__ == '__main__':
     you in a state of being able to work with the database directly.
     from server import app
     '''
-    from server import app 
+    # from server import app 
     #TODO: Janky testing function that needs to be turned into multiple asserts
     #      and put into tests.py
-    test_example_data(app, db_uri="postgresql:///ch")
+    # test_example_data(app, db_uri="postgresql:///ch")
     # test_seed_once(app, db_uri="postgresql:///ch")
-    #connect_to_db(app, db_uri="postgresql:///ch")
+    connect_to_db(app, db_uri="postgresql:///ch")
     print "Connected to DB."
 
 

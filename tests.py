@@ -4,10 +4,10 @@ import doctest
 import json
 from datetime import datetime
 from server import app
-from model import MyJSONEncoder, Message, User, Room, RoomUser, db, connect_to_db, seed_once, seed_force
+from model import MyJSONEncoder, Message, User, Room, RoomUser, db, connect_to_db, seed_force, seed_once
 
 
-travis_db_uri="postgresql:///travis_ci_test"
+travis_db_uri = "postgresql:///travis_ci_test"
 # class ChatModelTests(unittest.TestCase):
 #     '''Tests for the data model and ORM'''
 
@@ -35,6 +35,7 @@ travis_db_uri="postgresql:///travis_ci_test"
 #     tests.addTests(doctest.DocFileSuite("tests.txt"))
 #     return tests
 
+
 class ChatAPITests(unittest.TestCase):
     '''Integration tests for the API routes'''
 
@@ -46,13 +47,15 @@ class ChatAPITests(unittest.TestCase):
         # app.config['SQLALCHEMY_ECHO'] = True
         # Connect to the database
         connect_to_db(app, db_uri=travis_db_uri)
-        # Reset the world so we start with clean data
+        # Reset the world so we start with clean data,
+        # but first, avoid the Heisenbug...
+        db.session.commit()
+        # print 'seeding'
         seed_force(app)
+        # print 'finish seeding'
 
     def tearDown(self):
         '''What to do after each test'''
-        pass
-
 
 
     def test_show_all_rooms(self):
@@ -61,6 +64,7 @@ class ChatAPITests(unittest.TestCase):
         new_room = Room(name=room_name)
         db.session.add(new_room)
         db.session.commit()
+
         result = self.client.get('/api/rooms')
         self.assertIn('"name": "{}",'.format(room_name), result.data)
 
@@ -83,7 +87,7 @@ class ChatAPITests(unittest.TestCase):
         /api/rooms/<int:room_id>/messages?limit_responses=<int:limit_responses>
         /api/rooms/<int:room_id>/messages?last_updated=<datetime:last_updated>&limit_responses=<int:limit_responses>
         '''
-        # Background Context: 
+        # Background Context:
         # Flask's app.test_client normally resets the session scope
         # upon every call to the test_client. Model objects are bound to the
         # session. Because each call to the test_client ends the scope of a
@@ -93,9 +97,9 @@ class ChatAPITests(unittest.TestCase):
         # multiple calls to test_client without having to re-bind our objects
         # to each new session. That's the whole purpose of this next line.
         # Note: There's still something strange going on with session scoping
-        
+
         with self.client as test_client:
-        # if True:
+            # if True:
             room_name = "lalala"
             room_msg1 = 'What a happy penguin am I!'
             room_msg2 = "It's practically impossible to look at a penguin and feel angry."
@@ -120,7 +124,7 @@ class ChatAPITests(unittest.TestCase):
 
             # print type(balloonicorn), balloonicorn, balloonicorn.user_id
             # print type(anonymouse), anonymouse, anonymouse.user_id
-            #db.session.add(main_room.join_room(anonymouse))
+            # db.session.add(main_room.join_room(anonymouse))
             db.session.add(new_room.join_room(penny_penguin))
             db.session.add(new_room.join_room(balloonicorn))
             db.session.add(new_room.join_room(anonymouse))
@@ -135,21 +139,20 @@ class ChatAPITests(unittest.TestCase):
             #result = self.client.get('/api/rooms/{}'.format(int(new_room.room_id)))
             # import pdb; pdb.set_trace()
 
-
             result_post_1 = test_client.post(
-            # result_post_1 = self.client.post(
+                # result_post_1 = self.client.post(
                 '/api/rooms/{}/messages'.format(int(new_room.room_id)),
-                 data = {
+                data={
                     'data': room_msg1,
                     'user_id': anonymouse.user_id
-                    })
+                })
 
-            print "\n\n\nYO\n"
+            # print "\n\n\nYO\n"
             # import pdb; pdb.set_trace()
             balloonicorn.name
 
             # balloonicorn = db.session.merge(balloonicorn)
-            print "\n\n\n"
+            # print "\n\n\n"
 
             # print "Result POST 1: \n", result_post_1.data
             # penny_penguin = db.session.merge(penny_penguin)
@@ -157,15 +160,15 @@ class ChatAPITests(unittest.TestCase):
             # balloonicorn = db.session.merge(balloonicorn)
             # new_room = db.session.merge(new_room)
 
-            #FIXME: Make this a proper datestamp
+            # FIXME: Make this a proper datestamp
             # time_stamp = datetime.now().strftime()
             result_post_2 = test_client.post(
-            # result_post_2 = self.client.post(
+                # result_post_2 = self.client.post(
                 '/api/rooms/{}/messages'.format(int(new_room.room_id)),
-                 data = {
+                data={
                     'data': room_msg2,
                     'user_id': penny_penguin.user_id
-                    })
+                })
 
             # import pdb; pdb.set_trace()
 
@@ -177,10 +180,10 @@ class ChatAPITests(unittest.TestCase):
 
             result_post_3 = test_client.post(
                 '/api/rooms/{}/messages'.format(int(new_room.room_id)),
-                 data = {
+                data={
                     'data': room_msg3,
                     'user_id': balloonicorn.user_id
-                    })
+                })
 
             # print "Result POST 3: \n", result_post_3.data
             # penny_penguin = db.session.merge(penny_penguin)
@@ -211,7 +214,6 @@ class ChatAPITests(unittest.TestCase):
             self.assertIn(room_msg2, result_get_3.data)
             self.assertEqual(len(msg_list), 3)
 
-
     def test_create_room_message(self):
         '''Test POST server.show_room_messages'''
         room_name = "lalala"
@@ -237,10 +239,10 @@ class ChatAPITests(unittest.TestCase):
         # Have the user say something in the room
         result = self.client.post(
             '/api/rooms/{}/messages'.format(int(new_room.room_id)),
-             data = {
+            data={
                 'data': room_msg,
                 'user_id': new_user.user_id
-                })
+            })
         jason = json.loads(result.data)
         msg_list = jason["messages"]
         self.assertIn(new_user.name, result.data)
@@ -273,16 +275,17 @@ class ChatAPITests(unittest.TestCase):
 
             # print type(balloonicorn), balloonicorn, balloonicorn.user_id
             # print type(anonymouse), anonymouse, anonymouse.user_id
-            #db.session.add(main_room.join_room(anonymouse))
+            # db.session.add(main_room.join_room(anonymouse))
             db.session.add(new_room.join_room(penny_penguin))
             db.session.add(new_room.join_room(balloonicorn))
             db.session.add(new_room.join_room(anonymouse))
             db.session.commit()
 
-
-            result = test_client.get('/api/rooms/{}/users'.format(int(new_room.room_id)))
+            result = test_client.get(
+                '/api/rooms/{}/users'.format(int(new_room.room_id)))
             # print "rooms and users:\n", result.data
-            self.assertIn('"name": "{}",'.format(penny_penguin.name), result.data)
+            self.assertIn('"name": "{}",'.format(
+                penny_penguin.name), result.data)
 
     def test_create_room_users(self):
         '''Test POST server.show_room_users'''
@@ -307,11 +310,12 @@ class ChatAPITests(unittest.TestCase):
 
             result_post_1 = test_client.post(
                 '/api/rooms/{}/users'.format(int(new_room.room_id)),
-                 data = {
+                data={
                     'user_id': penny_penguin.user_id
-                    })
-            print "result_post_1:\n", result_post_1.data
-            self.assertIn('"name": "{}",'.format(penny_penguin.name), result_post_1.data)
+                })
+            # print "result_post_1:\n", result_post_1.data
+            self.assertIn('"name": "{}",'.format(
+                penny_penguin.name), result_post_1.data)
 
     def test_show_all_users(self):
         '''Test server.show_all_rooms()'''
@@ -321,6 +325,60 @@ class ChatAPITests(unittest.TestCase):
         db.session.commit()
         result = self.client.get('/api/users')
         self.assertIn('"name": "{}",'.format(penny_penguin.name), result.data)
+
+    def test_create_user(self):
+        '''Test server.create_user()'''
+        name = 'Penny Penguin'
+        result = self.client.post('/api/users',
+            data={
+                'name': name
+            })
+        user = User.query.filter(User.name == name).first()
+
+        # import pdb; pdb.set_trace()
+        self.assertIn('"name": "{}",'.format(name), result.data)
+        self.assertEqual(name, user.name)
+
+    def test_show_user(self):
+        '''Test server.show_user()'''
+        # Get Balloonicorn
+        user = User.query.get(1)
+        result = self.client.get('/api/users/{}'.format(int(user.user_id)))
+        self.assertIn(user.name, result.data)
+
+    def test_show_user_rooms(self):
+        '''Test server.show_user()'''
+        # Get Balloonicorn
+        user = User.query.get(1)
+        result = self.client.get('/api/users/{}/rooms'.format(int(user.user_id)))
+        data = json.loads(result.data)
+        # print "\ndata: ", type(data), len(data), data
+        # print user.rooms
+        # print len(user.rooms)
+
+        # import pdb; pdb.set_trace()
+        self.assertEqual(len(user.rooms), len(data))
+
+    def test_show_user_messages(self):
+        '''Test server.show_user()'''
+        with self.client as test_client:
+            # Get Balloonicorn
+            user = User.query.get(1)
+            room = Room.query.get(1)
+            msg1 = Message(user, room)
+            msg2 = Message(user, room, data="Victory!")
+            msg3 = Message(user, room, data="This point is ours!")
+            db.session.add_all([msg1, msg2, msg3])
+            db.session.commit()
+
+            # user
+            result = test_client.get('/api/users/{}/messages'.format(int(user.user_id)))
+            data = json.loads(result.data)
+            # print len(data["messages"]), 
+            # print len(user.messages), user.messages
+
+            # import pdb; pdb.set_trace()
+            self.assertEqual(len(user.messages), len(data["messages"]))
 
 
 
@@ -344,8 +402,18 @@ class ChatWebTests(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
 
     def test_path_to_favicon(self):
-        '''Checking the root route'''
+        '''Checking the favicon route'''
         result = self.client.get("/favicon.ico")
+        self.assertEqual(result.status_code, 200)
+
+    def test_path_to_healthcheck(self):
+        '''Checking route to healthcheck'''
+        result = self.client.get("/healthcheck")
+        self.assertEqual(result.status_code, 200)
+
+    def test_path_to_ping(self):
+        '''Checking route to ping'''
+        result = self.client.get("/ping")
         self.assertEqual(result.status_code, 200)
 
     # def test_rsvp(self):
@@ -361,5 +429,3 @@ class ChatWebTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-

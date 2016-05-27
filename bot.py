@@ -5,7 +5,6 @@ import urllib
 import urllib2
 import random
 
-
 # response = urllib2.urlopen('http://localhost:5001/api/users')
 # html = response.read()
 # print html
@@ -95,9 +94,9 @@ def post_chat_message(chat_message):
 # print type(j_list), len(j_list), j_list
 
 
-# get_user_info()
-ja_list = get_chat_history_all()
-parse_chat_message(ja_list[-1])
+get_user_info()
+# ja_list = get_chat_history_all()
+# parse_chat_message(ja_list[-1])
 
 
 

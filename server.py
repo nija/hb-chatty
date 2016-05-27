@@ -237,6 +237,7 @@ def show_all_users():
 @app.route('/api/users', methods=["POST"])
 def create_user():
     '''Return jsonified user from passed in form data'''
+    # print request.form
     name = request.form.get('name')
     user = User(name=name)
     db.session.add(user)
