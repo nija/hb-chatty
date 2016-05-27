@@ -1,6 +1,7 @@
 '''Chat Engine'''
 # pylint: disable=I0011,C0103
 import os
+import bleach
 from datetime import datetime
 from jinja2 import StrictUndefined
 from flask import Flask, jsonify, render_template, redirect, request, flash, send_from_directory, session
@@ -42,7 +43,6 @@ def serve_favicon():
     '''Serve our favicon'''
     return send_from_directory(os.path.join(app.root_path, 'static/img'), 'favicon.ico')
 
-
 @app.route('/ping')
 def serve_ping():
     '''Serve a basic healthcheck'''
@@ -55,7 +55,6 @@ def serve_ping():
 
     return render_template('ping.html',
                            db_status=db_status)
-
 
 @app.route('/healthcheck')
 def serve_healthcheck():
@@ -146,8 +145,6 @@ def show_room_messages(room_id):
     # print "\n\n\t", type(room_msgs), len(room_msgs), room_msgs[limit_responses:]
     return jsonify({"messages" : [msg.as_json() for msg in room_msgs[limit_responses:]]})
 
-
-
 # Post a message
 #TODO: Data sanitization
 @app.route('/api/rooms/<int:room_id>/messages', methods=["POST"])
@@ -159,6 +156,7 @@ def create_room_message(room_id):
 
     main_room = db.session.query(Room).get(room_id)
     data = request.form.get('data')
+    data = bleach.clean(data)
     uid = int(request.form.get('user_id'))
     user = db.session.query(User).get(uid)
     msg = Message(user=user, room=main_room, data=data)
@@ -181,7 +179,6 @@ def show_room_users(room_id):
     '''
     return jsonify({'users': db.session.query(Room).get(room_id).users_as_json()})
 
-
 # Join a specific room with a given user
 @app.route('/api/rooms/<int:room_id>/users', methods=["POST"])
 def create_room_users(room_id):
@@ -201,27 +198,27 @@ def create_room_users(room_id):
 
 # Leave a specific room with a given user
 #FIXME: This doesn't currently work
-@app.route('/api/rooms/<int:room_id>/users/leave', methods=["POST"])
-def remove_room_users(room_id):
-    '''
-    Have a user leave a room using the user_id in the POST data
-    '''
-    exit(1)
-    # import pdb; pdb.set_trace()
-    # Can call curl with --data-binary and retrieve with request.data
-    # API test: curl --data "data=bar&user_id=1" http://localhost:5001/messages
-    # print request.form
-    main_room = db.session.query(Room).get(room_id)
-    # print main_room
-    uid = int(request.form.get('user_id'))
-    # print data
-    # print type(uid), " uid: ", uid
-    user = db.session.query(User).get(uid)
-    db.session.delete(main_room.leave_room(room=main_room, user=user))
-    db.session.commit()
-    # Debug below
-    show_room_users(room_id)
-    return jsonify({'left': True})
+# @app.route('/api/rooms/<int:room_id>/users/leave', methods=["POST"])
+# def remove_room_users(room_id):
+#     '''
+#     Have a user leave a room using the user_id in the POST data
+#     '''
+#     exit(1)
+#     # import pdb; pdb.set_trace()
+#     # Can call curl with --data-binary and retrieve with request.data
+#     # API test: curl --data "data=bar&user_id=1" http://localhost:5001/messages
+#     # print request.form
+#     main_room = db.session.query(Room).get(room_id)
+#     # print main_room
+#     uid = int(request.form.get('user_id'))
+#     # print data
+#     # print type(uid), " uid: ", uid
+#     user = db.session.query(User).get(uid)
+#     db.session.delete(main_room.leave_room(room=main_room, user=user))
+#     db.session.commit()
+#     # Debug below
+#     show_room_users(room_id)
+#     return jsonify({'left': True})
 
 # Get the list of all users
 @app.route('/api/users', methods=["GET"])
@@ -231,7 +228,6 @@ def show_all_users():
     '''
     return jsonify({'users': [user.as_json() for user in User.query.all()]})
 
-
 # Create a user
 # API test: curl --data "name=username" http://localhost:5001/api/users
 @app.route('/api/users', methods=["POST"])
@@ -239,6 +235,7 @@ def create_user():
     '''Return jsonified user from passed in form data'''
     # print request.form
     name = request.form.get('name')
+    name = bleach(name)
     user = User(name=name)
     db.session.add(user)
     db.session.commit()
@@ -265,10 +262,6 @@ def show_user_rooms(user_id):
 def show_user_messages(user_id):
     '''Return jsonified user messages from passed in user_id'''
     return jsonify({'messages': db.session.query(User).get(user_id).messages_as_json()})
-
-
-
-
 
 
 if __name__ == "__main__":

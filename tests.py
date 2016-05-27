@@ -374,7 +374,7 @@ class ChatAPITests(unittest.TestCase):
             # user
             result = test_client.get('/api/users/{}/messages'.format(int(user.user_id)))
             data = json.loads(result.data)
-            # print len(data["messages"]), 
+            # print len(data["messages"]), data["messages"]
             # print len(user.messages), user.messages
 
             # import pdb; pdb.set_trace()
