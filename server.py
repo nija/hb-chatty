@@ -235,7 +235,7 @@ def create_user():
     '''Return jsonified user from passed in form data'''
     # print request.form
     name = request.form.get('name')
-    name = bleach(name)
+    name = bleach.clean(name)
     user = User(name=name)
     db.session.add(user)
     db.session.commit()
