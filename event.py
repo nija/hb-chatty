@@ -29,7 +29,7 @@ if __name__ == '__main__':
     '''Allow interactive use of the class'''
     event1 = Event(
                    Event.Types.message_created_event,
-                   {"room_id":1, "data": "pyro weather 94301", "user_id": 123})
+                   {"room_id":1, "data": "Pyro weather 94301", "user_id": 123})
     event2 = Event(
                    Event.Types.user_joins_room, 
                    {"user_id":1, "room_id":2})

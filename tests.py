@@ -380,6 +380,43 @@ class ChatAPITests(unittest.TestCase):
             # import pdb; pdb.set_trace()
             self.assertEqual(len(user.messages), len(data["messages"]))
 
+    def test_weatherbot_handle_event(self):
+        '''Test POST WeatherBot.handle_event'''
+        room_name = "lalala"
+        room_msg = 'Pyro weather 94040'
+        user_name = 'Penny Penguin'
+
+        # Create a room
+        new_room = Room(name=room_name)
+        db.session.add(new_room)
+        db.session.commit()
+
+        # Create a user
+        new_user = User(user_name)
+        db.session.add(new_user)
+        db.session.commit()
+
+        # Add the user to the room
+        new_room = Room.query.filter(Room.name == room_name).first()
+        new_user = User.query.filter(User.name == user_name).first()
+        db.session.add(new_room.join_room(new_user))
+        db.session.commit()
+
+        # Have the user say something in the room
+        result = self.client.post(
+            '/api/rooms/{}/messages'.format(int(new_room.room_id)),
+            data={
+                'data': room_msg,
+                'user_id': new_user.user_id
+            })
+        # jason = json.loads(result.data)
+        # msg_list = jason["messages"]
+        # self.assertIn(new_user.name, result.data)
+        # self.assertIn(room_msg, result.data)
+        # # We know there should only be one message because everything
+        # # gets recreated before and after each test
+        # self.assertEqual(len(msg_list), 1)
+
 
 
 

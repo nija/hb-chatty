@@ -14,9 +14,10 @@ class Bus(object):
             return
 
         for listener in self.listeners[event.get_type()]:
-            # Notify all the registered listeners
+            # Call each listener's handle_event() and pass the event
             listener.handle_event(event)
         return
+
 
     def register(self, listener, event_type):
         '''Allows registration of a listener for an event_type'''

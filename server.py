@@ -36,7 +36,7 @@ app.secret_key = 'BalloonicornSmash'
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
-# Create bus and register listeners on the bus
+# Create event bus and register listeners on the bus
 bus = Bus()
 weather_bot_name = 'Pyro'
 bus.register(WeatherBot(weather_bot_name), Event.Types.message_created_event)
