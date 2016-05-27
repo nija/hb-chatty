@@ -383,7 +383,7 @@ class ChatAPITests(unittest.TestCase):
     def test_weatherbot_handle_event(self):
         '''Test POST WeatherBot.handle_event'''
         room_name = "lalala"
-        room_msg = 'Pyro weather 94040'
+        room_msg = 'Pyro weather 94501'
         user_name = 'Penny Penguin'
 
         # Create a room
@@ -409,8 +409,10 @@ class ChatAPITests(unittest.TestCase):
                 'data': room_msg,
                 'user_id': new_user.user_id
             })
-        # jason = json.loads(result.data)
-        # msg_list = jason["messages"]
+
+        jason = json.loads(result.data)
+        msg_list = jason["messages"]
+        print msg_list
         # self.assertIn(new_user.name, result.data)
         # self.assertIn(room_msg, result.data)
         # # We know there should only be one message because everything

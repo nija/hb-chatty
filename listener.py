@@ -25,9 +25,8 @@ class WeatherBot(Listener):
 
 
     def handle_event(self, event):
-        print "WeatherBot is handling event {}".format(event)
+        # print "WeatherBot is handling event {}".format(event)
         msg_data = event.data.get("data")
-        pattern = "^(.*)\s(.*)\s(\d*)\s"
 
         # functions = ["weather", "zombie", "lyft"]
 
@@ -46,39 +45,6 @@ class WeatherBot(Listener):
             return
 
         return
-
-
-    # def handle_event(self, event):
-    #     '''Is this an event addressed to us?
-    #     If so, handle it. If not, toss it'''
-    #     # print "{} is handling event {}".format(
-    #     #     type(self).__name__,
-    #     #     event)
-
-    #     # Access the dict key/value with a get so it doesn't throw an exception
-    #     msg_data = event.data.get("data")
-
-    #     # Parse the message data
-    #     # Must be of the form:
-    #     #   bot_name weather zipcode
-    #     # If the message is addressed to us,
-    #     if msg_data.startswith(self.name):
-    #         # If the message contains the keyword weather
-    #         if "weather" in msg_data:
-    #             # Parse the message
-    #             print "{} is handling event {}".format(
-    #                 type(self).__name__,
-    #                 event)
-    #             pattern = "^(.*)\s(.*)\s(\d*)\s"
-    #             groups = re.findall(pattern, msg_data)
-    #             print msg_data
-    #             print groups
-    #             import pdb; pdb.set_trace()
-    #             location = groups[0][2]
-    #             self.do_weather(location)
-    #     else:
-    #         return
-    #     return
 
     def do_weather(self, location):
         data = WeatherAPI.get_weather(self.api_key, location)

@@ -5,7 +5,7 @@ class Event(object):
     class Types(object):
         """Types of Event classes"""
         message_created_event = 'MESSAGE_CREATED_EVENT'
-        user_joins_room = 'USER_JOINS_ROOM_EVENT'
+        user_joins_room_event = 'USER_JOINS_ROOM_EVENT'
 
     def __init__(self, event_type, data):
         self.data = data
@@ -31,7 +31,7 @@ if __name__ == '__main__':
                    Event.Types.message_created_event,
                    {"room_id":1, "data": "Pyro weather 94301", "user_id": 123})
     event2 = Event(
-                   Event.Types.user_joins_room, 
+                   Event.Types.user_joins_room_event, 
                    {"user_id":1, "room_id":2})
     print event1
     print event2

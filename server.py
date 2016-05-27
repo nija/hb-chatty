@@ -219,7 +219,7 @@ def create_room_users(room_id):
     # Put the event on the bus
     print "Throwing user_joins_room"
     bus.notify(Event(
-        Event.Types.user_joins_room, 
+        Event.Types.user_joins_room_event, 
         {   'user_id':user.user_id,
             'user_name': user.name,
             'room_id': room_id}))
