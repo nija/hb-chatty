@@ -1,11 +1,12 @@
 import os
 import re
 from weather_api import WeatherAPI
-
+from event import Event
+from bus import Bus
 
 class Listener(object):
     """docstring for Listener"""
-    def __init__(self):
+    def __init__(self, bus):
         return
 
     def handle_event(self, event):
@@ -14,11 +15,12 @@ class Listener(object):
 class WeatherBot(Listener):
     """docstring for WeatherBot"""
 
-    def __init__(self, name):
+    def __init__(self, name, bus):
         self.name = name
+        self.bus = bus
         # Set the weather API key from env vars
         self.api_key = "&APPID={}".format(os.environ.get('APPID'))
-
+        self.server_path = 'http://localhost:5001/api'
 
     def __repr__(self):
         return "<{} {} {}>".format(type(self).__name__, self.name, self.api_key)
@@ -40,16 +42,16 @@ class WeatherBot(Listener):
                 pattern = "^(.*)\s(.*)\s(\d*)"
                 groups = re.findall(pattern, msg_data)
                 location = groups[0][2]
-                self.do_weather(location)
+                self.do_weather(location, event)
         else:
             return
 
         return
 
-    def do_weather(self, location):
-        data = WeatherAPI.get_weather(self.api_key, location)
-        print "\n\n\nWeather result:\n{}\n\n\n".format(data)
-
+    def do_weather(self, location, event):
+        weather_response = WeatherAPI.get_weather(self.api_key, location)
+        print "\n\n\nWeather result:\n{}\n\n\n".format(weather_response)
+        # self.bus.notify(Event(Event.Types.message_response_event), msg_response)
 
 
 

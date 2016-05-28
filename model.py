@@ -199,6 +199,17 @@ class Room(db.Model):
         #"Created association: {}{}{} \n".format(joined, self, user)
         return joined
 
+    def contains_user(self, user):
+        '''Is the user in the room? returns a boolean'''
+        check_join = RoomUser.query.filter(
+                        RoomUser.room_id == self.room_id,
+                        RoomUser.user_id == user.user_id)
+        if check_join.first():
+            return True
+        return False
+
+
+
     #FIXME: This doesn't work currently
     def leave_room(self, room, user):
         '''

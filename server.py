@@ -36,13 +36,11 @@ app.secret_key = 'BalloonicornSmash'
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
-# Create event bus and register listeners on the bus
+# Create an event bus
 bus = Bus()
-weather_bot_name = 'Pyro'
-bus.register(WeatherBot(weather_bot_name), Event.Types.message_created_event)
-
 
 # ====== END Server Start-up ======
+
 
 
 # ====== Routes Definitions ======
@@ -209,20 +207,23 @@ def create_room_users(room_id):
     '''
     Have a user join a room using the user_id in the POST data
     '''
-    main_room = db.session.query(Room).get(room_id)
+    a_room = db.session.query(Room).get(room_id)
     uid = int(request.form.get('user_id'))
     user = db.session.query(User).get(uid)
-    # Add the user to the room
-    db.session.add(main_room.join_room(user))
-    db.session.commit()
 
-    # Put the event on the bus
-    print "Throwing user_joins_room"
-    bus.notify(Event(
-        Event.Types.user_joins_room_event, 
-        {   'user_id':user.user_id,
-            'user_name': user.name,
-            'room_id': room_id}))
+    # If the user is not already in the room
+    if not a_room.contains_user(user):
+        # Add the user to the room
+        db.session.add(a_room.join_room(user))
+        db.session.commit()
+
+        # Put the event on the bus
+        print "Throwing user_joins_room"
+        bus.notify(Event(
+            Event.Types.user_joins_room_event, 
+            {   'user_id':user.user_id,
+                'user_name': user.name,
+                'room_id': room_id}))
 
     # Return the current list of users in the room; re-use the function we
     # already have to do this
@@ -296,6 +297,14 @@ def show_user_messages(user_id):
     return jsonify({'messages': db.session.query(User).get(user_id).messages_as_json()})
 
 
+
+# class ServerListener(Listener):
+#     """docstring for ServerListener"""
+#     def __init__(self, app, bus):
+#         super(ServerListener, self).__init__()
+#         self.app = app
+#         self.bus = bus
+
 if __name__ == "__main__":
 
     # Connect to the database
@@ -311,6 +320,38 @@ if __name__ == "__main__":
 
     # Create our data schema and default objects if needed
     seed_once(app)
+
+
+
+
+    # Create a weather bot
+    weatherbot_name = 'Pyro'
+    weatherbot = WeatherBot(weatherbot_name, bus)
+    # Register our new bot with the bus as a listener for 
+    # any Event.Types.message_created_event that are emitted
+    bus.register(weatherbot, Event.Types.message_created_event)
+    # Get the weatherbot user object, creating it if need be
+    weatherbot_check = User.query.filter(User.name == weatherbot_name)
+    if not weatherbot_check.first():
+#        print "\n\n\nCREATING WEATHER BOT\n\n\n"
+        # Create the user
+        db.session.add(User(weatherbot_name))
+        db.session.commit()
+
+    # Attach the user object to the weatherbot
+#    print "\n\n\nWEATHER BOT EXISTS\n\n\n"
+    weatherbot.user = weatherbot_check.first()
+    default_room = db.session.query(Room).get(1)
+    # Add the user to the room if needed
+    if not default_room.contains_user(weatherbot.user):
+#        print "\n\n\nADDING WEATHER BOT TO DEFAULT ROOM\n\n\n"
+        db.session.add(default_room.join_room(weatherbot.user))
+        db.session.commit()
+
+#    print "\n\n\nWEATHER BOT IN DEFAULT ROOM\n\n\n"
+
+
+
 
     # Right now, we only have one room and one user in that room
 

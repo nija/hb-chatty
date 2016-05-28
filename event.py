@@ -5,6 +5,7 @@ class Event(object):
     class Types(object):
         """Types of Event classes"""
         message_created_event = 'MESSAGE_CREATED_EVENT'
+        message_response_event = 'MESSAGE_RESPONSE_EVENT'
         user_joins_room_event = 'USER_JOINS_ROOM_EVENT'
 
     def __init__(self, event_type, data):
