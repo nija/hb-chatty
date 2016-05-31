@@ -48,49 +48,6 @@ sparklebot = SparkleBot(name=sparklebot_name, bus=bus)
 bus.register(sparklebot, Event.Types.message_created_event)
 
 
-    # # Get the weatherbot user object, creating it if need be
-    # weatherbot_check = User.query.filter(User.name == weatherbot_name)
-    # if not weatherbot_check.first():
-    #     # print "\n\n\nCREATING WEATHER BOT DB USER\n\n\n"
-    #     # Create the user
-    #     db.session.add(User(weatherbot_name))
-    #     db.session.commit()
-    # weatherbot.set_user(weatherbot_check.first().user_id)
-    # # Add the user to the room if needed
-    # if not default_room.contains_user(weatherbot.user):
-    #     # print "\n\n\nADDING WEATHER BOT TO DEFAULT ROOM\n\n\n"
-    #     db.session.add(default_room.join_room(weatherbot.user))
-    #     db.session.commit()
-
-#FIXME: Weatherbot instantiation should not include user object
-
-    # # Get the weather bot set up
-    # weatherbot_name = 'Pyro'
-    # # Get the weatherbot user object, creating it if need be
-    # weatherbot_check = User.query.filter(User.name == weatherbot_name)
-    # if not weatherbot_check.first():
-    #     # print "\n\n\nCREATING WEATHER BOT DB USER\n\n\n"
-    #     # Create the user
-    #     db.session.add(User(weatherbot_name))
-    #     db.session.commit()
-
-    # # Attach the user object to the weatherbot
-    # # print "\n\n\nWEATHER BOT DB USER EXISTS\n\n\n"
-    # weatherbot = WeatherBot(name=weatherbot_name, bus=bus, user=weatherbot_check.first())
-    # default_room = db.session.query(Room).get(1)
-    # # Add the user to the room if needed
-    # if not default_room.contains_user(weatherbot.user):
-    #     # print "\n\n\nADDING WEATHER BOT TO DEFAULT ROOM\n\n\n"
-    #     db.session.add(default_room.join_room(weatherbot.user))
-    #     db.session.commit()
-
-    # # print "\n\n\nWEATHER BOT IN DEFAULT ROOM\n\n\n"
-
-    # # Register our new bot with the bus as a listener for 
-    # # any Event.Types.message_created_event that are emitted
-    # bus.register(weatherbot, Event.Types.message_created_event)
-
-
 # ====== END Server Start-up ======
 
 
@@ -381,7 +338,7 @@ if __name__ == "__main__":
     # Get the sparklebot user object, creating it if need be
     sparklebot_check = User.query.filter(User.name == sparklebot_name)
     if not sparklebot_check.first():
-        # print "\n\n\nCREATING SPARKLE BOT DB USER\n\n\n"
+        print "\n\n\nCREATING SPARKLE BOT DB USER\n\n\n"
         # Create the user
         db.session.add(User(sparklebot_name))
         db.session.commit()
@@ -389,7 +346,7 @@ if __name__ == "__main__":
     sparklebot.set_user_id(sparklebot_user.user_id)
     # Add the user to the room if needed
     if not default_room.contains_user(sparklebot_user.user_id):
-        # print "\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n"
+        print "\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n"
         db.session.add(default_room.join_room(sparklebot_user))
         db.session.commit()
 
@@ -405,7 +362,7 @@ if __name__ == "__main__":
     # app.debug = False
 
     # Allow more processes so there's enough wiggle room to handle multiple requests
-    app.run(processes=4)
+    app.run(processes=3)
     # Use the DebugToolbar
     DebugToolbarExtension(app)
     app.run(port=5001)

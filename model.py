@@ -350,19 +350,26 @@ def test_create_get_users(app):
 
 def test_get_users(app):
     users = User.query.all()
-    print users
+    print "Users:\n", users
 
 def test_join_room(app):
-    fran = User(name='Fran Allen')
-    db.session.add(fran)
-    db.session.commit()
+    import pdb; pdb.set_trace()
+    check_fran = User.query.filter(User.name == 'Fran Allen').first()
+    # If Fran Allen doesn't exist
+    if not check_fran:
+        # Create Fran Allen
+        fran = User(name='Fran Allen')
+        db.session.add(fran)
+        db.session.commit()
     main_room = db.session.query(Room).get(1)
     fran = User.query.filter(User.name == 'Fran Allen').first()
-    db.session.add(main_room.join_room(fran))
-    # db.session.add(main_room.join_room(balloonicorn))
-    db.session.commit()
-    # print main_room.users
-    #FIXME: assert fran in users
+    # If the user is not already in the room
+    if not main_room.contains_user(fran):
+        # Add the user to the room
+        db.session.add(main_room.join_room(fran))
+        # db.session.add(main_room.join_room(balloonicorn))
+        db.session.commit()
+    print main_room.users
 
 def test_get_rooms(app):
     ''' '''
@@ -407,7 +414,6 @@ def test_create_get_messages(app):
 #TODO: Turn these into asserts and put them into tests.py
 def test_example_data(app, db_uri):
     '''Create example data for the test database.'''
-
     connect_to_db(app, db_uri)
 
     # Tests follow
@@ -415,29 +421,12 @@ def test_example_data(app, db_uri):
     # Reset the world
     seed_force(app)
 
-    # Create and insert Users
-    # balloonicorn = db.session.query(User).get(1)
-    # # balloonicorn = User(name="Balloonicorn")
-    # grace = User(name="Grace Hopper")
-    # # db.session.add(balloonicorn)
-    # db.session.add(grace)
-    # db.session.commit()
+    # Try to get users
     test_create_get_users(app)
 
     # Test user retrieval
-    # users = User.query.all()
-    # print users
     test_get_users(app)
 
-
-    # Create and insert a room
-    # main_room = db.session.query(Room).get(1)
-    # # main_room = Room()
-    # # db.session.add(main_room)
-    # # db.session.commit()
-    # db.session.add(main_room.join_room(grace))
-    # # db.session.add(main_room.join_room(balloonicorn))
-    # db.session.commit()
     test_join_room(app)
 
 
@@ -515,7 +504,7 @@ def connect_to_db(app, db_uri="postgresql:///ch"):
     # app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
-
+    print "finishing model.connect_to_db"
 
 if __name__ == '__main__':
     '''
@@ -523,12 +512,11 @@ if __name__ == '__main__':
     you in a state of being able to work with the database directly.
     from server import app
     '''
-    # from server import app 
-    #TODO: Janky testing function that needs to be turned into multiple asserts
-    #      and put into tests.py
-    # test_example_data(app, db_uri="postgresql:///ch")
+    from server import app 
+    #TODO: Make janky testing non-janky
+    test_example_data(app, db_uri="postgresql:///ch")
     # test_seed_once(app, db_uri="postgresql:///ch")
-    connect_to_db(app, db_uri="postgresql:///ch")
+    # connect_to_db(app, db_uri="postgresql:///ch")
     print "Connected to DB."
 
 
