@@ -353,7 +353,7 @@ def test_get_users(app):
     print "Users:\n", users
 
 def test_join_room(app):
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     check_fran = User.query.filter(User.name == 'Fran Allen').first()
     # If Fran Allen doesn't exist
     if not check_fran:
