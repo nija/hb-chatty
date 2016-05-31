@@ -13,7 +13,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 # Custom imports
 from bus import Bus
 from event import Event
-from listener import WeatherBot
+from listener import SparkleBot
 from model import Message, MyJSONEncoder, Room, User, connect_to_db, db, seed_once, seed_force
 
 # Log all the things
@@ -39,13 +39,13 @@ app.jinja_env.undefined = StrictUndefined
 # Create an event bus
 bus = Bus()
 
-weatherbot_name = 'Pyro'
+sparklebot_name = 'Pyro'
 
-weatherbot = WeatherBot(name=weatherbot_name, bus=bus)
+sparklebot = SparkleBot(name=sparklebot_name, bus=bus)
 
-# Register our new bot with the bus as a listener for 
+# Register our new bot with the bus as a listener for
 # any Event.Types.message_created_event that are emitted
-bus.register(weatherbot, Event.Types.message_created_event)
+bus.register(sparklebot, Event.Types.message_created_event)
 
 
     # # Get the weatherbot user object, creating it if need be
@@ -375,22 +375,22 @@ if __name__ == "__main__":
     seed_once(app)
 
 
-    # Tell our weatherbot which user to post messages as and which room
+    # Tell our sparklebot which user to post messages as and which room
     # to frequent
     default_room = db.session.query(Room).get(1)
-    # Get the weatherbot user object, creating it if need be
-    weatherbot_check = User.query.filter(User.name == weatherbot_name)
-    if not weatherbot_check.first():
-        # print "\n\n\nCREATING WEATHER BOT DB USER\n\n\n"
+    # Get the sparklebot user object, creating it if need be
+    sparklebot_check = User.query.filter(User.name == sparklebot_name)
+    if not sparklebot_check.first():
+        # print "\n\n\nCREATING SPARKLE BOT DB USER\n\n\n"
         # Create the user
-        db.session.add(User(weatherbot_name))
+        db.session.add(User(sparklebot_name))
         db.session.commit()
-    weatherbot_user = weatherbot_check.first()
-    weatherbot.set_user_id(weatherbot_user.user_id)
+    sparklebot_user = sparklebot_check.first()
+    sparklebot.set_user_id(sparklebot_user.user_id)
     # Add the user to the room if needed
-    if not default_room.contains_user(weatherbot_user.user_id):
-        # print "\n\n\nADDING WEATHER BOT TO DEFAULT ROOM\n\n\n"
-        db.session.add(default_room.join_room(weatherbot_user))
+    if not default_room.contains_user(sparklebot_user.user_id):
+        # print "\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n"
+        db.session.add(default_room.join_room(sparklebot_user))
         db.session.commit()
 
 

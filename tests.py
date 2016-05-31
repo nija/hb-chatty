@@ -380,8 +380,8 @@ class ChatAPITests(unittest.TestCase):
             # import pdb; pdb.set_trace()
             self.assertEqual(len(user.messages), len(data["messages"]))
 
-    def test_weatherbot_handle_event(self):
-        '''Test POST WeatherBot.handle_event'''
+    def test_sparklebot_handle_event(self):
+        '''Test POST SparkleBot.handle_event'''
         room_name = "lalala"
         room_msg = 'Pyro weather 94501'
         user_name = 'Penny Penguin'

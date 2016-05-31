@@ -5,7 +5,7 @@ class Bus(object):
         self.listeners = {}
         return
 
-    def notify (self, event):
+    def notify(self, event):
         '''Notifies the registered listeners of the emitted event'''
         print "{} notified of event {}".format(type(self).__name__, event.get_type())
 
