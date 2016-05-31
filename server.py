@@ -39,6 +39,58 @@ app.jinja_env.undefined = StrictUndefined
 # Create an event bus
 bus = Bus()
 
+weatherbot_name = 'Pyro'
+
+weatherbot = WeatherBot(name=weatherbot_name, bus=bus)
+
+# Register our new bot with the bus as a listener for 
+# any Event.Types.message_created_event that are emitted
+bus.register(weatherbot, Event.Types.message_created_event)
+
+
+    # # Get the weatherbot user object, creating it if need be
+    # weatherbot_check = User.query.filter(User.name == weatherbot_name)
+    # if not weatherbot_check.first():
+    #     # print "\n\n\nCREATING WEATHER BOT DB USER\n\n\n"
+    #     # Create the user
+    #     db.session.add(User(weatherbot_name))
+    #     db.session.commit()
+    # weatherbot.set_user(weatherbot_check.first().user_id)
+    # # Add the user to the room if needed
+    # if not default_room.contains_user(weatherbot.user):
+    #     # print "\n\n\nADDING WEATHER BOT TO DEFAULT ROOM\n\n\n"
+    #     db.session.add(default_room.join_room(weatherbot.user))
+    #     db.session.commit()
+
+#FIXME: Weatherbot instantiation should not include user object
+
+    # # Get the weather bot set up
+    # weatherbot_name = 'Pyro'
+    # # Get the weatherbot user object, creating it if need be
+    # weatherbot_check = User.query.filter(User.name == weatherbot_name)
+    # if not weatherbot_check.first():
+    #     # print "\n\n\nCREATING WEATHER BOT DB USER\n\n\n"
+    #     # Create the user
+    #     db.session.add(User(weatherbot_name))
+    #     db.session.commit()
+
+    # # Attach the user object to the weatherbot
+    # # print "\n\n\nWEATHER BOT DB USER EXISTS\n\n\n"
+    # weatherbot = WeatherBot(name=weatherbot_name, bus=bus, user=weatherbot_check.first())
+    # default_room = db.session.query(Room).get(1)
+    # # Add the user to the room if needed
+    # if not default_room.contains_user(weatherbot.user):
+    #     # print "\n\n\nADDING WEATHER BOT TO DEFAULT ROOM\n\n\n"
+    #     db.session.add(default_room.join_room(weatherbot.user))
+    #     db.session.commit()
+
+    # # print "\n\n\nWEATHER BOT IN DEFAULT ROOM\n\n\n"
+
+    # # Register our new bot with the bus as a listener for 
+    # # any Event.Types.message_created_event that are emitted
+    # bus.register(weatherbot, Event.Types.message_created_event)
+
+
 # ====== END Server Start-up ======
 
 
@@ -169,6 +221,7 @@ def create_room_message(room_id):
     # API test: curl --data "data=Hi, I am Sally&user_id=3" http://localhost:5001/api/rooms/1/messages
     # print request.form
 
+    #import pdb; pdb.set_trace()
     main_room = db.session.query(Room).get(room_id)
     data = request.form.get('data')
     data = bleach.clean(data)
@@ -322,35 +375,23 @@ if __name__ == "__main__":
     seed_once(app)
 
 
-
-
-    # Create a weather bot
-    weatherbot_name = 'Pyro'
-    weatherbot = WeatherBot(weatherbot_name, bus)
-    # Register our new bot with the bus as a listener for 
-    # any Event.Types.message_created_event that are emitted
-    bus.register(weatherbot, Event.Types.message_created_event)
+    # Tell our weatherbot which user to post messages as and which room
+    # to frequent
+    default_room = db.session.query(Room).get(1)
     # Get the weatherbot user object, creating it if need be
     weatherbot_check = User.query.filter(User.name == weatherbot_name)
     if not weatherbot_check.first():
-#        print "\n\n\nCREATING WEATHER BOT\n\n\n"
+        # print "\n\n\nCREATING WEATHER BOT DB USER\n\n\n"
         # Create the user
         db.session.add(User(weatherbot_name))
         db.session.commit()
-
-    # Attach the user object to the weatherbot
-#    print "\n\n\nWEATHER BOT EXISTS\n\n\n"
-    weatherbot.user = weatherbot_check.first()
-    default_room = db.session.query(Room).get(1)
+    weatherbot_user = weatherbot_check.first()
+    weatherbot.set_user_id(weatherbot_user.user_id)
     # Add the user to the room if needed
-    if not default_room.contains_user(weatherbot.user):
-#        print "\n\n\nADDING WEATHER BOT TO DEFAULT ROOM\n\n\n"
-        db.session.add(default_room.join_room(weatherbot.user))
+    if not default_room.contains_user(weatherbot_user.user_id):
+        # print "\n\n\nADDING WEATHER BOT TO DEFAULT ROOM\n\n\n"
+        db.session.add(default_room.join_room(weatherbot_user))
         db.session.commit()
-
-#    print "\n\n\nWEATHER BOT IN DEFAULT ROOM\n\n\n"
-
-
 
 
     # Right now, we only have one room and one user in that room
@@ -363,6 +404,8 @@ if __name__ == "__main__":
     app.debug = True
     # app.debug = False
 
+    # Allow more processes so there's enough wiggle room to handle multiple requests
+    app.run(processes=4)
     # Use the DebugToolbar
     DebugToolbarExtension(app)
     app.run(port=5001)
