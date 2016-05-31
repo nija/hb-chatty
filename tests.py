@@ -307,8 +307,8 @@ class ChatAPITests(unittest.TestCase):
             # Add the user to the room
             new_room = Room.query.filter(Room.name == room_name).first()
             penny_penguin = User.query.filter(User.name == user_name).first()
-            import pdb; pdb.set_trace()
-            
+            #import pdb; pdb.set_trace()
+
             result_post_1 = test_client.post(
                 '/api/rooms/{}/users'.format(int(new_room.room_id)),
                 data={
