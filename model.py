@@ -353,15 +353,18 @@ def test_get_users(app):
     print "Users:\n", users
 
 def test_join_room(app):
-    #import pdb; pdb.set_trace()
-    check_fran = User.query.filter(User.name == 'Fran Allen').first()
+    check_fran = User.query.filter(User.name == 'Fran Allen')
+    import pdb; pdb.set_trace()
     # If Fran Allen doesn't exist
-    if not check_fran:
+    if not check_fran.first():
         # Create Fran Allen
+        print "Creating Fran Allen"
         fran = User(name='Fran Allen')
         db.session.add(fran)
         db.session.commit()
+
     main_room = db.session.query(Room).get(1)
+    print "Got room {}".format(main_room)
     fran = User.query.filter(User.name == 'Fran Allen').first()
     # If the user is not already in the room
     if not main_room.contains_user(fran):
@@ -369,7 +372,7 @@ def test_join_room(app):
         db.session.add(main_room.join_room(fran))
         # db.session.add(main_room.join_room(balloonicorn))
         db.session.commit()
-    print main_room.users
+    print 'Room: {}\nUsers: {}'.format(main_room.room_id, main_room.users_as_json())
 
 def test_get_rooms(app):
     ''' '''
@@ -427,6 +430,7 @@ def test_example_data(app, db_uri):
     # Test user retrieval
     test_get_users(app)
 
+    # Test joining a room
     test_join_room(app)
 
 
@@ -438,33 +442,7 @@ def test_example_data(app, db_uri):
     # print room_users
     test_get_rooms(app)
 
-    # Create and insert Messages
-    # a_message = Message(room=main_room, user=grace, data="Please cut off a nanosecond and send it over to me")
-    # b_message = Message(room=main_room, user=grace, data='I need something to compare this to. Could I please have a microsecond?')
-    # c_message = Message(room=main_room, user=grace, data='I had a running compiler and nobody would touch it... they carefully told me, computers could only do arithmetic; they could not do programs.')
-    # d_message = Message(room=main_room, user=grace, data="I've always been more interested in the future than in the past.")
-    # e_message = Message(room=main_room, user=grace, data='Life was simple before World War II. After that, we had systems.')
-    # f_message = Message(room=main_room, user=grace, data='A ship in port is safe; but that is not what ships are built for. Sail out to sea and do new things.')
-    # g_message = Message(room=main_room, user=grace, data='The wonderful thing about standards is that there are so many of them to choose from.')
-    # h_message = Message(room=main_room, user=grace, data="In pioneer days they used oxen for heavy pulling, and when one ox couldn't budge a log, they didn't try to grow a larger ox. We shouldn't be trying for bigger computers, but for more systems of computers.")
-    # i_message = Message(room=main_room, user=grace, data="It's easier to ask forgiveness than it is to get permission.")
-    # j_message = Message(room=main_room, user=grace, data='We must state relationships, not procedures.')
-    # k_message = Message(room=main_room, user=balloonicorn, data="Burn everything")
-    # db.session.add(a_message)
-    # db.session.add(b_message)
-    # db.session.add(c_message)
-    # db.session.add(d_message)
-    # db.session.add(e_message)
-    # db.session.add(f_message)
-    # db.session.add(g_message)
-    # db.session.add(h_message)
-    # db.session.add(i_message)
-    # db.session.add(j_message)
-    # db.session.add(k_message)
-    # db.session.commit()
-    # Test retrieval
-    # messages = Message.query.all()
-    # print messages
+    # Test message creation and retrieval
     test_create_get_messages(app)
 
 
@@ -504,7 +482,6 @@ def connect_to_db(app, db_uri="postgresql:///chatty"):
     # app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
-    print "finishing model.connect_to_db"
 
 if __name__ == '__main__':
     '''

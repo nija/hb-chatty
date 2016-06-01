@@ -60,18 +60,27 @@ class SparkleBot(Listener):
         if event.data.get('user_id') == self.user_id:
             return
 
+        # TODO: I feel the below code should work to find the function to call
         # event_keywords = {"weather":['zipcode'], "zombie":[], "lyft":[]}
 
         # if msg_data.startswith(self.name):
-        #     for function in event_keywords.keys():
-        #         if function in msg_data.contains(function):
-        #             getattr(function, )
+        #     for method in event_keywords.keys():
+        #         me = None
+        #         if method in msg_data:
+        #             try:
+        #                 me = getattr(self,'do_{}'.format(method))
+        #             except AttributeError:
+        #                 raise NotImplementedError(
+        #                     "Class '{}' does not implement '{}'".format(
+        #                         type(self).__name__,
+        #                         method)
+        #             self.me(event)
 
         # Generic politeness responses
         if self.name in msg_data:
-            if (msg_data.startswith(('hello','Hello','hi','Hi','Greetings','greetings', 'hiya','Hiya'))):
+            if msg_data.startswith(('hello', 'Hello', 'hi', 'Hi', 'Greetings', 'greetings', 'hiya', 'Hiya')):
                 self.do_greeting(event)
-            elif (msg_data.startswith(('thank you','Thank you','thanks','Thanks','ty','TY'))):
+            elif msg_data.startswith(('thank you', 'Thank you', 'thanks', 'Thanks', 'ty', 'TY')):
                 self.do_welcome_response(event)
 
             # Functional responses

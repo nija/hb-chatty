@@ -120,16 +120,3 @@ if __name__ == '__main__':
                 'static/markov_text/through_the_looking_glass.txt'])
 
     print marky.tell_a_story()
-    # # Open the files and turn them into one long string
-    # input_text = open_and_read_files(argv[2:])
-
-    # # Get a Markov chain
-    # chainz = make_chains(input_text)
-
-    # # Produce random text
-    # random_text = make_text(chainz)
-
-    # return random_text
-
-    # Tweet that business!
-    # tweet(chains)
