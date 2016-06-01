@@ -60,24 +60,45 @@ class SparkleBot(Listener):
         if event.data.get('user_id') == self.user_id:
             return
 
-        # functions = ["weather", "zombie", "lyft"]
+        # event_keywords = {"weather":['zipcode'], "zombie":[], "lyft":[]}
 
-        # if msg_data.startswith("pyro"):
-        #     for function in functions:
+        # if msg_data.startswith(self.name):
+        #     for function in event_keywords.keys():
         #         if function in msg_data.contains(function):
         #             getattr(function, )
 
-        if msg_data.startswith(self.name):
-            if "weather" in msg_data:
-                self.do_weather(event)
-            elif "story" in msg_data:
-                self.do_story(event)
-            elif "help" in msg_data:
-                self.do_help(event, event_keywords)
-        else:
-            return
+        # Generic politeness responses
+        if self.name in msg_data:
+            if (msg_data.startswith(('hello','Hello','hi','Hi','Greetings','greetings', 'hiya','Hiya'))):
+                self.do_greeting(event)
+            elif (msg_data.startswith(('thank you','Thank you','thanks','Thanks','ty','TY'))):
+                self.do_welcome_response(event)
 
+            # Functional responses
+            elif msg_data.startswith(self.name):
+                if "weather" in msg_data:
+                    self.do_weather(event)
+                elif "story" in msg_data:
+                    self.do_story(event)
+                elif "help" in msg_data:
+                    self.do_help(event, event_keywords)
+            else:
+                return
         return
+
+    def do_greeting(self, event):
+        '''Respond to a user's greeting'''
+        requestor_name = event.data.get("user_name")
+        room_id = event.data.get("room_id")
+        message = "Hello {}".format(requestor_name)
+        self.post_result(room_id, message)
+
+    def do_welcome_response(self, event):
+        '''Respond to a user's thanks'''
+        requestor_name = event.data.get("user_name")
+        room_id = event.data.get("room_id")
+        message = "You are welcome, {}".format(requestor_name)
+        self.post_result(room_id, message)
 
     def do_help(self, event, event_keywords):
         '''Posts a help message to the user'''

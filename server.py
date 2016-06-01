@@ -362,10 +362,9 @@ if __name__ == "__main__":
     # app.debug = False
 
     # Allow more processes so there's enough wiggle room to handle multiple requests
-    app.run(processes=3)
     # Use the DebugToolbar
     DebugToolbarExtension(app)
-    app.run(port=5001)
+    app.run(port=5001, processes=3)
 
 
 

@@ -494,7 +494,7 @@ def test_example_data(app, db_uri):
 
 # Default to connecting to the test db so we don't accidentally screw with our
 # real db
-def connect_to_db(app, db_uri="postgresql:///ch"):
+def connect_to_db(app, db_uri="postgresql:///chatty"):
     '''
     Configure the database-app connection
     Takes an app and an optional db_uri
