@@ -66,7 +66,7 @@ class SparkleBot(Listener):
             return
 
         # TODO: I feel the below code should work to find the function to call
-        # event_keywords = {"weather":['zipcode'], "zombie":[], "lyft":[]}
+        # event_keywords = {"weather":['zipcode'], "story":[], "zombie":[]}
 
         # if msg_data.startswith(self.name):
         #     for method in event_keywords.keys():

@@ -354,7 +354,7 @@ def test_get_users(app):
 
 def test_join_room(app):
     check_fran = User.query.filter(User.name == 'Fran Allen')
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     # If Fran Allen doesn't exist
     if not check_fran.first():
         # Create Fran Allen
@@ -367,7 +367,7 @@ def test_join_room(app):
     print "Got room {}".format(main_room)
     fran = User.query.filter(User.name == 'Fran Allen').first()
     # If the user is not already in the room
-    if not main_room.contains_user(fran):
+    if not main_room.contains_user(fran.user_id):
         # Add the user to the room
         db.session.add(main_room.join_room(fran))
         # db.session.add(main_room.join_room(balloonicorn))
@@ -425,10 +425,10 @@ def test_example_data(app, db_uri):
     seed_force(app)
 
     # Try to get users
-    test_create_get_users(app)
+    # test_create_get_users(app)
 
     # Test user retrieval
-    test_get_users(app)
+    # test_get_users(app)
 
     # Test joining a room
     test_join_room(app)
@@ -440,10 +440,10 @@ def test_example_data(app, db_uri):
     # room_users = RoomUser.query.all()
     # print rooms
     # print room_users
-    test_get_rooms(app)
+    #test_get_rooms(app)
 
     # Test message creation and retrieval
-    test_create_get_messages(app)
+    #test_create_get_messages(app)
 
 
     #######

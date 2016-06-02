@@ -307,7 +307,6 @@ class ChatAPITests(unittest.TestCase):
             # Add the user to the room
             new_room = Room.query.filter(Room.name == room_name).first()
             penny_penguin = User.query.filter(User.name == user_name).first()
-            #import pdb; pdb.set_trace()
 
             result_post_1 = test_client.post(
                 '/api/rooms/{}/users'.format(int(new_room.room_id)),
@@ -315,6 +314,7 @@ class ChatAPITests(unittest.TestCase):
                     'user_id': penny_penguin.user_id
                 })
             # print "result_post_1:\n", result_post_1.data
+            penny_penguin
             self.assertIn('"name": "{}",'.format(
                 penny_penguin.name), result_post_1.data)
 

@@ -3,9 +3,11 @@
 
 # ====== Imports ======
 # Standard imports
-import os
 import bleach
 from datetime import datetime
+import json
+import os
+import pprint
 # Flask and related imports
 from jinja2 import StrictUndefined
 from flask import Flask, jsonify, render_template, redirect, request, flash, send_from_directory, session
@@ -95,7 +97,10 @@ def serve_healthcheck():
     app_location = '{}'.format(app.root_path)
     app_extensions = '{}'.format(app.extensions)
     # Be rude and use a protected function
+    # pp = pprint.PrettyPrinter()
     app_endpoints = '{}'.format(app.url_map._rules_by_endpoint)
+    # app_endpoints = pp.pformat(app.url_map._rules_by_endpoint)
+    # app_endpoints = json.dumps(app.url_map._rules_by_endpoint)
 
     num_rooms = len(Room.query.all())
     num_users = len(User.query.all())
@@ -222,7 +227,7 @@ def create_room_users(room_id):
     user = db.session.query(User).get(uid)
 
     # If the user is not already in the room
-    if not a_room.contains_user(user):
+    if not a_room.contains_user(user.user_id):
         # Add the user to the room
         db.session.add(a_room.join_room(user))
         db.session.commit()
