@@ -8,10 +8,12 @@ import os
 import re
 import urllib
 import urllib2
+import pprint
 from weather_api import WeatherAPI
 from event import Event
 from bus import Bus
 from markov import Markov
+
 
 class Listener(object):
     """docstring for Listener"""
@@ -28,7 +30,10 @@ class SparkleBot(Listener):
         self.name = name
         self.bus = bus
         # Set the weather API key from env vars
-        self.api_key = "&APPID={}".format(os.environ.get('APPID'))
+        # For openweathermap API key
+        # self.api_key = "&APPID={}".format(os.environ.get('APPID'))
+        # For Wunderground API key
+        self.api_key = os.environ.get('WUNDERGROUND_API_KEY')
         self.server_path = 'http://localhost:5001/api'
         self.user_id = user_id
         self. marky = Markov(
@@ -140,32 +145,33 @@ class SparkleBot(Listener):
         groups = re.findall(pattern, msg_data)
         location = groups[0][2]
         weather_response = WeatherAPI.get_weather(self.api_key, location)
-        # print event
-        # print dir(event)
-        # import pdb; pdb.set_trace()
-        # print "\n\n\nWeather result:\n{}\n\n\n".format(weather_response)
-        # self.bus.notify(Event(Event.Types.message_response_event), msg_response)
-        wr_city = weather_response["name"]
-        wr_main = weather_response["main"]
-        wr_main_temp = wr_main["temp"]
-        wr_weather = weather_response["weather"][0]
-        wr_weather_desc = wr_weather["description"]
-        wr_main_temp_f = (wr_main_temp * (9/5.0)) - 459.67
 
+        # Parsing for OpenWeatherMap
+        # pp = pprint.PrettyPrinter()
+        # pp.pprint(weather_response)
+        # wr_city = weather_response["name"]
+        # wr_main = weather_response["main"]
+        # wr_main_temp = wr_main["temp"]
+        # wr_weather = weather_response["weather"][0]
+        # wr_weather_desc = wr_weather["description"]
+        # wr_main_temp_f = (wr_main_temp * (9/5.0)) - 459.67
 
-        # print "\n\n\nWeather result:\n{}, {} is {} degrees and experiencing {}\n\n\n".format(
-        #     requestor_name,
-        #     wr_city,
-        #     wr_main_temp,
-        #     wr_weather_desc)
+        # Parsing for Wunderground
+        # pp = pprint.PrettyPrinter()
+        # wr = weather_response["current_observation"]
+        # pp.pprint(wr)
+        wr_city = weather_response["current_observation"]["display_location"]["city"]
+        wr_main_temp_f = weather_response["current_observation"]["temperature_string"]
+        wr_weather_desc = weather_response["current_observation"]["weather"].lower()
 
         # Create the response payload
-        message = "{}, {} is {}F and experiencing {}".format(
+        message = "{}, {} is {} and is {}".format(
             requestor_name,
             wr_city,
             wr_main_temp_f,
             wr_weather_desc)
 
+        # return message
         # Post the response
         self.post_result(room_id, message)
 
@@ -178,7 +184,7 @@ class SparkleBot(Listener):
         post_request = urllib2.Request(endpoint, data)
         post_response = urllib2.urlopen(post_request)
         response = post_response.read()
-        print response
+        # print response
 
 # GET request
 # req = urllib2.Request('http://www.voidspace.org.uk')
@@ -201,7 +207,17 @@ class SparkleBot(Listener):
 # d = response.read()
 # print d
 
+if __name__ == '__main__':
+    bus = Bus()
+    sparkle = SparkleBot("sparkle", bus)
 
+    event1 = Event(
+                   Event.Types.message_created_event,
+                   {"room_id":1, "data": "Pyro weather 94301", "user_id": 123})
+
+    out = sparkle.do_weather(event1)
+
+    print out
 
 
 
