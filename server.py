@@ -189,6 +189,9 @@ def create_room_message(room_id):
     data = bleach.clean(data)
     uid = int(request.form.get('user_id'))
     user = db.session.query(User).get(uid)
+    # If nothing is left in the message, don't return anything
+    # if data == '':
+    #     return
     msg = Message(user=user, room=main_room, data=data)
 
     # Create the date fields using the database
@@ -369,7 +372,7 @@ if __name__ == "__main__":
     # Allow more processes so there's enough wiggle room to handle multiple requests
     # Use the DebugToolbar
     DebugToolbarExtension(app)
-    app.run(port=5001, processes=3)
+    app.run(host="0.0.0.0", port=5001, processes=3)
 
 
 
