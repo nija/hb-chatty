@@ -36,14 +36,14 @@ class SparkleBot(Listener):
         self.api_key = os.environ.get('WUNDERGROUND_API_KEY')
         self.server_path = 'http://localhost:5001/api'
         self.user_id = user_id
-        self. marky = Markov(
+        self.marky = Markov(
             limit = 600,
             ngram = 7,
             paths = ['static/markov_text/alice_in_wonderland.txt',
                     'static/markov_text/through_the_looking_glass.txt'])
 
     def __repr__(self):
-        return "<{} {} {}>".format(type(self).__name__, self.name, self.api_key)
+        return "<{} {} {} {}>".format(type(self).__name__, self.name, self.user_id, self.server_path)
 
     def set_user_id(self, user_id):
         '''adds a user id to SparkleBot, needed for responses'''
@@ -186,6 +186,39 @@ class SparkleBot(Listener):
         response = post_response.read()
         # print response
 
+class BabbleBot(Listener):
+    """docstring for BabbleBot"""
+        
+    def __init__(self, name, bus, user_id=1):
+        self.name = name
+        self.bus = bus
+        self.server_path = 'http://localhost:5001/api'
+        self.user_id = user_id
+
+
+    def __repr__(self):
+        return "<{} {} {} {}>".format(type(self).__name__, self.name, self.user_id, self.server_path)
+
+    def get_user_id(self):
+        '''returns the user id SparkleBot is using, needed for responses'''
+        return self.user_id
+
+    def set_user_id(self, user_id):
+        '''adds a user id to SparkleBot, needed for responses'''
+        self.user_id = user_id
+
+    def post_result(self, room_id, message):
+        '''Posts a message back to the server using the API'''
+        endpoint = "{}/rooms/{}/messages".format(self.server_path, room_id)
+        values = {'user_id': '{}'.format(self.user_id), 'data': message}
+        data = urllib.urlencode(values)
+        # print "\n\n\nPosting {} to {} with uid {}\n\n\n".format(data, endpoint, self.user_id)
+        post_request = urllib2.Request(endpoint, data)
+        post_response = urllib2.urlopen(post_request)
+        response = post_response.read()
+        # print response
+
+
 # GET request
 # req = urllib2.Request('http://www.voidspace.org.uk')
 # response = urllib2.urlopen(req)
@@ -206,6 +239,7 @@ class SparkleBot(Listener):
 # response = urllib2.urlopen(req)
 # d = response.read()
 # print d
+
 
 if __name__ == '__main__':
     bus = Bus()
