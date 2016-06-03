@@ -2,10 +2,21 @@
 
 {% block title %} Basic healthcheck {% endblock %}
 
+
+{% block body %}<body class="pingBody">{% endblock %}
+
 {% block content %}
 
-<h3>Basic healthcheck for chat room microservice</h3>
-
-db_status = {{ db_status }} <br>
+<table class="infoTable">
+<thead>
+	<tr>
+		<td colspan="100%"><h3>Basic healthcheck for chat room microservice</h3></td>
+	</tr>
+</thead>
+	<tr>
+		<td><span class='infoAttr'>DB Status</span></td>
+		<td><span class='infoAttrValue'> {{ db_status }} </td>
+	</tr>
+</table>
 
 {% endblock %}

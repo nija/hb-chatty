@@ -119,6 +119,12 @@ def serve_healthcheck():
     host = {{ type(self).__name__ }}<br>
     database = {{ app.database }}<br>'''
 
+
+@app.route('/new')
+def serve_new():
+    '''Serve our favicon'''
+    return send_from_directory(os.path.join(app.root_path,), 'new_home.html')
+
 ######  API Routes  ######
 
 # Get the list of all rooms

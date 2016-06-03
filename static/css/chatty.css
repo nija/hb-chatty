@@ -1,13 +1,5 @@
 
 
-body {
-	background-image: url("../img/balloonicorn.com.background.jpg");
-    background-repeat: no-repeat;
-    background-position: right top;
-    background-attachment: fixed;
-
-}
-
 th {
     font-family: 'Lobster', sans-serif;
     font-weight: normal;
@@ -18,6 +10,31 @@ h3 {
 	text-align: center;
 }
 
+/* Body tags, generally setting backgrounds */
+
+.chatBody {
+	background-image: url("../img/balloonicorn.com.background.jpg");
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-attachment: fixed;
+}
+
+.pingBody {	
+	background-size: cover;
+	background-image: url("../img/lalalalalaIloveunicorns.png");
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-attachment: fixed;
+}
+
+.healthcheckBody {
+	background-size: cover;
+	background-image: url("../img/pyroland_background.png");
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-attachment: fixed;
+}
+
 .mainChatTable {
 	width: 80%;
 	border: none /*2px solid black*/;
@@ -25,9 +42,13 @@ h3 {
 	border-radius: 15px 100px 40px 5px;
 	margin-left: auto;
 	margin-right: auto;
-	padding: 15px; /*why does this not work? :( */
+    border-collapse: separate;
+    border-spacing: 10px;
 }
 
+.mainChatInput {
+	width: 80%;
+}
 
 .infoTable {
 	margin-top: 5%;
@@ -35,9 +56,11 @@ h3 {
 	margin-right: auto;
 	width: 80%;
 	border: 2px solid grey;
-	background: rgba(255,255,255,0.3);
+	background: rgba(255,255,255,0.5);
 	/*border-radius: 15px 100px 40px 5px;*/
 	padding: 15px;
+    border-collapse: separate;
+    border-spacing: 10px;
 }
 
 .infoAttr {
@@ -49,9 +72,16 @@ h3 {
 	color: grey;
 }
 
+
+
 #messageHistory {
 	color: #295d5b;
 	font-weight: bold;
+}
+
+#footer {
+	text-align: right;
+	padding: 30px;
 }
 
 

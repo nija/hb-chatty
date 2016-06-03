@@ -21,7 +21,7 @@
         href="/static/css/chatty.css"> 
 
 </head>
-<body>
+{% block body %}<body>{% endblock %}
 <div class="container">
   <h1 align="center">
     <a href="/">Balloonicorn's Land of Milk and Honey</a>
@@ -33,6 +33,12 @@
   {% block content %}CONTENT HERE{% endblock %}
 </div>
 
+<!-- Sticky footer -->
+    <footer class="footer" id="footer">
+      <div class="container">
+        <p class="text-muted">&copy; 2016 Balloonicorn.net</p>
+      </div>
+    </footer>
 
 <!-- <script type="text/javascript" src="../static/js/chatty.js"></script> -->
 </body>
