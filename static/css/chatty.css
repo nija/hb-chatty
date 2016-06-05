@@ -38,17 +38,37 @@ h3 {
 .mainChatTable {
 	width: 80%;
 	border: none /*2px solid black*/;
-	background: rgba(255,255,255,0.3);
+	background: rgba(255,255,255,0.55);
 	border-radius: 15px 100px 40px 5px;
 	margin-left: auto;
 	margin-right: auto;
     border-collapse: separate;
     border-spacing: 10px;
+    word-break: break-word;
 }
 
 .mainChatInput {
 	width: 80%;
 }
+
+.messageAuthor {
+	color: #38807D;
+	font-weight: bold;
+}
+
+.messageData {
+	color: #0077B3;
+	font-weight: bold;
+}
+
+
+.mainUserTable {
+	border: none /*2px solid black*/;
+	background: rgba(255,255,255,0.55);
+    word-break: break-word;
+}
+
+/* Healthcheck classes */
 
 .infoTable {
 	margin-top: 5%;
@@ -72,11 +92,9 @@ h3 {
 	color: grey;
 }
 
-
-
 #messageHistory {
-	color: #295d5b;
-	font-weight: bold;
+/*	color: #295d5b;
+	font-weight: bold;*/
 }
 
 #footer {

@@ -17,7 +17,9 @@ from markov import Markov
 
 class Listener(object):
     """docstring for Listener"""
+    server_path = 'http://localhost:5001/api'
     def __init__(self, bus):
+
         return
 
     def handle_event(self, event):
@@ -34,7 +36,7 @@ class SparkleBot(Listener):
         # self.api_key = "&APPID={}".format(os.environ.get('APPID'))
         # For Wunderground API key
         self.api_key = os.environ.get('WUNDERGROUND_API_KEY')
-        self.server_path = 'http://localhost:5001/api'
+        # self.server_path = 'http://localhost:5001/api'
         self.user_id = user_id
         self.marky = Markov(
             limit = 600,
@@ -192,7 +194,6 @@ class BabbleBot(Listener):
     def __init__(self, name, bus, user_id=1):
         self.name = name
         self.bus = bus
-        self.server_path = 'http://localhost:5001/api'
         self.user_id = user_id
 
 
