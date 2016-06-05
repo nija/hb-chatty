@@ -298,7 +298,7 @@ def seed_once(app):
         main_room = db.session.query(Room).get(1)
 
         # Create the system user
-        balloonicorn = User("Balloonicorn_Bot")
+        balloonicorn = User("Balloonicorn")
         db.session.add(balloonicorn)
         db.session.commit()
         balloonicorn = db.session.query(User).get(1)
