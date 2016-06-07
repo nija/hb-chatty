@@ -1,10 +1,5 @@
 /* Overridden standard tags */
 
-th {
-    font-family: 'Play', sans-serif;
-    font-weight: normal;
-}
-
 h1 {
 	color: #0077B3;
 	text-align: center;
@@ -21,6 +16,22 @@ h3 {
 	color: grey;
 	text-align: center;
     font-family: 'Play', sans-serif;
+}
+
+/* Tables */
+
+th {
+    font-family: 'Play', sans-serif;
+    font-weight: normal;
+}
+
+td:not(:last-child) {
+    word-break: break-word;
+    white-space: nowrap;
+}
+
+td:last-child{
+    width: 100%;
 }
 
 /* Body tags, generally setting backgrounds */
@@ -74,6 +85,10 @@ font-family: 'Exo', sans-serif;
 	width: 80%;
 }
 
+.mainChatSubmitBtn {
+	padding-right: 50px; 
+}
+
 .messageDate {
 	color: grey;
 }
@@ -81,6 +96,7 @@ font-family: 'Exo', sans-serif;
 .messageAuthor {
 	color: #38807D;
 	font-weight: bold;
+	white-space: nowrap;
 }
 
 .messageData {

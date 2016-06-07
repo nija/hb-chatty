@@ -7,18 +7,16 @@ $(document).ready(function(){
     setInterval(loadChat,1000)
     setInterval(loadUserList,1010)
 
-    // Eventually, we want to use moments.js for the timestamp
-
     // Define the success functions aka callbacks
     function loadMessages(results) {
         // Define a return string
         var history = '';
+        // Get our results payload
         var messages = results.messages;
         // Get the offset
         var utcDiff = moment().utcOffset() / 60;
         // This works but is deprecated
         // var utcOffset_real = moment().zone() / 60;
-        // console.log(utcDiff);
 
         for (var i = 0; i < messages.length; i++) {
             // 2016-06-03T00:35:15.484657-07:00
@@ -26,7 +24,7 @@ $(document).ready(function(){
 
             var dt_stamp = moment(messages[i].created_at, 'YYYY-MM-DDTHH:mm:ss.SSSSSSZ').add(utcDiff,'hours').fromNow();
 
-            history += "<span class='messageDate'>" + dt_stamp + "</span>&nbsp;&nbsp;<span class='messageAuthor'> " + messages[i].user_name + "</span>: <span class='messageData'>" + messages[i].data + "</span><br>";
+            history += "<tr><td class='tdMessageDate'><span class='hidden-xs messageDate'>" + dt_stamp + "</span></td><td class='tdMessageAuthor'><span class='messageAuthor'> " + messages[i].user_name + "</span></td><td class='tdMessageData'><span class='messageData'>" + messages[i].data + "</span></td></tr>";
         };
 
         // Pollute the global namespace like American Electric Power pollutes the air
@@ -53,15 +51,12 @@ $(document).ready(function(){
 
         for (var i = 0; i < users.length; i++) { 
             user_elements += "<span class='list-group-item userName'>" + users[i].name + "</span>";
-            // user_elements += "<a href='#' class='list-group-item'><span class='userName'>" + users[i].name + "</span></a>";
-            // console.log("User ", users[i].name)
+
         };
 
-        // console.log(users.length + ' users found.')
         // Replace the return string
         $('#userList').html(user_elements);
 
-        // console.log("Finished loadUsers");
     }
 
     // Define the event handler to handle the AJAX GET request

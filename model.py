@@ -491,7 +491,7 @@ def connect_to_db(app, db_uri="postgresql:///chatty"):
     '''
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # app.config['SQLALCHEMY_ECHO'] = True
+    app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
 
@@ -503,9 +503,9 @@ if __name__ == '__main__':
     '''
     from server import app 
     #TODO: Make janky testing non-janky
-    test_example_data(app, db_uri="postgresql:///ch")
-    # test_seed_once(app, db_uri="postgresql:///ch")
-    # connect_to_db(app, db_uri="postgresql:///ch")
+    test_example_data(app, db_uri="postgresql:///chatty")
+    # test_seed_once(app, db_uri="postgresql:///chatty")
+    # connect_to_db(app, db_uri="postgresql:///chatty")
     print "Connected to DB."
 
 

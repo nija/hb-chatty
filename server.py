@@ -11,7 +11,7 @@ import pprint
 # Flask and related imports
 from jinja2 import StrictUndefined
 from flask import Flask, jsonify, render_template, redirect, request, flash, send_from_directory, session
-from flask_debugtoolbar import DebugToolbarExtension
+# from flask_debugtoolbar import DebugToolbarExtension
 # Custom imports
 from bus import Bus
 from event import Event
@@ -352,7 +352,7 @@ if __name__ == "__main__":
     # Get the sparklebot user object, creating it if need be
     sparklebot_check = User.query.filter(User.name == sparklebot_name)
     if not sparklebot_check.first():
-        print "\n\n\nCREATING SPARKLE BOT DB USER\n\n\n"
+        # print "\n\n\nCREATING SPARKLE BOT DB USER\n\n\n"
         # Create the user
         db.session.add(User(sparklebot_name))
         db.session.commit()
@@ -360,7 +360,7 @@ if __name__ == "__main__":
     sparklebot.set_user_id(sparklebot_user.user_id)
     # Add the user to the room if needed
     if not default_room.contains_user(sparklebot_user.user_id):
-        print "\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n"
+        # print "\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n"
         db.session.add(default_room.join_room(sparklebot_user))
         db.session.commit()
 
@@ -369,15 +369,16 @@ if __name__ == "__main__":
 
     print "\n    HEREEEEE!\n\n"
 
-    # We have to set debug=True here, since it has to be True at the point
-    # that we invoke the DebugToolbarExtension
-    # Leave this as the last step since we don't want random restarts before now
+    # DebugToolbarExtension requires debug=True before it will run correctly
+    # Leave this as is because of the 'No handlers could be found for logger
+    # "sqlalchemy.pool.QueuePool"' http 500 error that results when it is taken
+    # out
     app.debug = True
     # app.debug = False
 
     # Allow more processes so there's enough wiggle room to handle multiple requests
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
     app.run(host="0.0.0.0", port=5001, processes=3)
 
 

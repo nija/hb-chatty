@@ -9,6 +9,7 @@
   <link rel="stylesheet" 
         type='text/css'
         href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script type="text/javascript"
         src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <!-- Load Google Fonts -->
@@ -23,7 +24,7 @@
 
 </head>
 {% block body %}<body>{% endblock %}
-<div class="container">
+<div class="container-fluid">
   <h1 align="center">Balloonicorn's Land of Milk and Honey
   </h1>
   {% for msg in get_flashed_messages() %}

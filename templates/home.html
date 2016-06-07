@@ -1,66 +1,58 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 
-{% block title %} It's a Party! {% endblock %}
-
-
-{% block body %}<body class="chatBody">{% endblock %}
-
-{% block content %}
- <!-- Load my custom javascript, which waits till the page loads and then loads the right functions -->
-<script type="text/javascript" src="/static/js/chatty.js"></script>
-<br>
-<br>
-
-<div class="container">
-	<div class="row row-offcanvas row-offcanvas-right">
-		<div class="col-xs-12 col-sm-12 col-md-9">
-			<div class="row">
-
-<!-- Main table -->
+{% block title %} It's a Party! {% endblock %} 
 
 
-<table class="table table-responsive mainChatTable">
-	<thead>
-		<tr>
-			<td><h3>Chat room</h3></td>
-		</tr>
-	</thead>
-	<tr>
-		<td id="messageHistory">Live long and be chatty!</td>
-	</tr>
-	<tr>
-		<td class="message_typing_row">
-			<input type="text" 
-					class="mainChatInput",
-					name="message_typing_box" 
-					id="message_typing_box" 
-					autofocus="True" 
-					maxlength="2040"
-					placeholder="Enter your message" />
-			<button id="message_typing_submit" class="btn btn-primary btn-lg">Say it</button>
-		</td>
-	</tr>
-</table>
-<!-- End of main table -->
+{% block body %}
 
-			</div> <!-- row -->
-		</div> <!-- col-xs-12 col-sm-9 -->
-
-
-<!-- Load the users block -->
-<div class="col-xs-10 col-sm-10 col-md-3 sidebar-offcanvas" id="sidebar">
-  <div class="list-group">
-  	<span class="list-group-item mainUserTable"> <h3>Companions</h3><br>
-		<span id="userList">
-		    <a href="#" class="list-group-item">Users</a>
-    	</span>
-    </span>
-  </div>
-</div><!--/.sidebar-offcanvas-->
-
-
-	</div> <!-- row row-offcanvas row-offcanvas-right -->
-</div> <!-- container -->
-
-<script type="text/javascript" src="../static/js/moment.min.js"></script>
-{% endblock %}
+<body class="chatBody">{% endblock %} {% block content %}
+    <!-- Load my custom javascript, which waits till the page loads and then loads the right functions -->
+    <script type="text/javascript" src="/static/js/chatty.js"></script>
+    <br>
+    <br>
+    <div class="container-fluid">
+        <div class="row row-offcanvas row-offcanvas-right">
+            <div class="col-xs-12 col-sm-12 col-md-9">
+                <div class="row">
+                    <!-- Main table -->
+                    <div class="table-responsive">
+                        <table class="mainChatTable">
+                            <thead>
+                                <tr>
+                                    <td><h2>Chat room</h2></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="messageHistory">Live long and be chatty!</td>
+                                </tr>
+                                <tr>
+                                    <td class="message_typing_row">
+                                        <input type="text" class="mainChatInput" , name="message_typing_box" id="message_typing_box" autofocus="True" maxlength="2040" placeholder="Enter your message" />
+                                        <button id="message_typing_submit" class="mainChatSubmitBtn btn btn-primary btn-lg pull-right">Say it</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- End of main table -->
+                    </div>
+                    <!-- table-responsive -->
+                </div>
+                <!-- row -->
+            </div>
+            <!-- col-xs-12 col-sm-9 -->
+            <!-- Load the users block -->
+            <div class="col-xs-10 col-sm-10 col-md-3 sidebar-offcanvas" id="sidebar">
+                <div class="list-group">
+                    <span class="list-group-item mainUserTable"> <h3>Companions</h3><br>
+						<span id="userList">Users</span>
+                    </span>
+                </div>
+            </div>
+            <!--/.sidebar-offcanvas-->
+        </div>
+        <!-- row row-offcanvas row-offcanvas-right -->
+    </div>
+    <!-- container -->
+    <script type="text/javascript" src="../static/js/moment.min.js"></script>
+    {% endblock %}
