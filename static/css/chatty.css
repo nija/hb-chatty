@@ -1,17 +1,37 @@
-
+/* Overridden standard tags */
 
 th {
-    font-family: 'Lobster', sans-serif;
+    font-family: 'Play', sans-serif;
     font-weight: normal;
+}
+
+h1 {
+	color: #0077B3;
+	text-align: center;
+    font-family: 'Play', sans-serif;
+}
+
+h2 {
+	color: grey;
+	text-align: center;
+    font-family: 'Play', sans-serif;
 }
 
 h3 {
 	color: grey;
 	text-align: center;
+    font-family: 'Play', sans-serif;
 }
 
 /* Body tags, generally setting backgrounds */
 
+
+/* Font options from Goog fonts
+font-family: 'Ubuntu', sans-serif;
+font-family: 'Bitter', serif;
+font-family: 'Play', sans-serif;
+font-family: 'Exo', sans-serif;
+*/
 .chatBody {
 	background-image: url("../img/balloonicorn.com.background.jpg");
     background-repeat: no-repeat;
@@ -35,13 +55,16 @@ h3 {
     background-attachment: fixed;
 }
 
+/* Main chat page */
+
 .mainChatTable {
-	width: 80%;
+	width: 100%;
 	border: none /*2px solid black*/;
 	background: rgba(255,255,255,0.55);
 	border-radius: 15px 100px 40px 5px;
 	margin-left: auto;
 	margin-right: auto;
+	/*margin-bottom: 20%;*/
     border-collapse: separate;
     border-spacing: 10px;
     word-break: break-word;
@@ -51,6 +74,10 @@ h3 {
 	width: 80%;
 }
 
+.messageDate {
+	color: grey;
+}
+
 .messageAuthor {
 	color: #38807D;
 	font-weight: bold;
@@ -58,14 +85,21 @@ h3 {
 
 .messageData {
 	color: #0077B3;
-	font-weight: bold;
 }
 
-
 .mainUserTable {
+	width: 80%;
 	border: none /*2px solid black*/;
 	background: rgba(255,255,255,0.55);
     word-break: break-word;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 5%;
+}
+
+.userName {
+	font-family: 'Exo', sans-serif;	
+	color: grey;
 }
 
 /* Healthcheck classes */
@@ -93,8 +127,8 @@ h3 {
 }
 
 #messageHistory {
-/*	color: #295d5b;
-	font-weight: bold;*/
+	font-family: 'Bitter', sans-serif;
+	padding: 5px;
 }
 
 #footer {

@@ -1,8 +1,15 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.inspection import inspect
 from datetime import datetime, timedelta
+from pytz import timezone
+import pytz
 from flask.json import JSONEncoder
 # from contextlib import suppress
+
+# >>> from datetime import datetime, timedelta
+# >>> from pytz import timezone
+# >>> import pytz
+# >>> utc = pytz.utc
 
 # How long to persist data we care about
 EXPIRE_DELTA = 2
@@ -41,10 +48,14 @@ class Message(db.Model):
     Representation of a Message object
     Uses a global called EXPIRE DELTA to set default data retention
     '''
+    # import pytz
+    # from datetime import datetime
+    # datetime.utcnow().replace(tzinfo = pytz.utc)
+    # utc_dt = datetime.utcfromtimestamp(1143408899).replace(tzinfo=utc)
     message_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     data = db.Column(db.String(2048))
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
-    expiry_at = db.Column(db.DateTime)
+    expiry_at = db.Column(db.DateTime(timezone=True))
     # Foreign keys
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     room_id = db.Column(db.Integer, db.ForeignKey('room.room_id'))
@@ -58,6 +69,7 @@ class Message(db.Model):
     def __init__(self, user, room, data="This is a test message from a blue balloon"):
         self.data = data
         self.created_at = datetime.utcnow()
+        self.created_at.replace(tzinfo=pytz.utc)
         self.expiry_at = self.created_at + timedelta(days=EXPIRE_DELTA)
         self.user_id = user.user_id
         self.room_id = room.room_id

@@ -5,7 +5,7 @@ $(document).ready(function(){
     loadUserList();
     // Start polling
     setInterval(loadChat,1000)
-    // setInterval(loadUsers,1010)
+    setInterval(loadUserList,1010)
 
     // Eventually, we want to use moments.js for the timestamp
 
@@ -14,13 +14,23 @@ $(document).ready(function(){
         // Define a return string
         var history = '';
         var messages = results.messages;
-        for (var i = 0; i < messages.length; i++) { 
-            history += messages[i].created_at + " &nbsp;&nbsp;<span class='messageAuthor'> " + messages[i].user_name + "</span>: <span class='messageData'>" + messages[i].data + "</span><br>";
+        // Get the offset
+        var utcDiff = moment().utcOffset() / 60;
+        // This works but is deprecated
+        // var utcOffset_real = moment().zone() / 60;
+        // console.log(utcDiff);
+
+        for (var i = 0; i < messages.length; i++) {
+            // 2016-06-03T00:35:15.484657-07:00
+            // YYYY-MM-DDTHH:mm:ss.SSSSSSZ
+
+            var dt_stamp = moment(messages[i].created_at, 'YYYY-MM-DDTHH:mm:ss.SSSSSSZ').add(utcDiff,'hours').fromNow();
+
+            history += "<span class='messageDate'>" + dt_stamp + "</span>&nbsp;&nbsp;<span class='messageAuthor'> " + messages[i].user_name + "</span>: <span class='messageData'>" + messages[i].data + "</span><br>";
         };
 
         // Pollute the global namespace like American Electric Power pollutes the air
         window.last_updated = messages[messages.length - 1].created_at
-        //console.log("last_updated for ", messages[messages.length - 1], " is ", window.last_updated)
         // Replace the return string
         $('#messageHistory').html(history);
 
@@ -37,20 +47,21 @@ $(document).ready(function(){
 
     function loadUsers(results) {
         // Define a return string
-        console.log("Starting loadUsers")
+        // console.log("Starting loadUsers")
         var user_elements = '';
         var users = results.users;
 
         for (var i = 0; i < users.length; i++) { 
-            user_elements += "<a href='#' class='list-group-item'><span class='userName'>" + users[i].name + "</span></a>";
-            console.log("User ", users[i].name)
+            user_elements += "<span class='list-group-item userName'>" + users[i].name + "</span>";
+            // user_elements += "<a href='#' class='list-group-item'><span class='userName'>" + users[i].name + "</span></a>";
+            // console.log("User ", users[i].name)
         };
 
-        console.log(users.length + ' users found.')
+        // console.log(users.length + ' users found.')
         // Replace the return string
         $('#userList').html(user_elements);
 
-        console.log("Finished loadUsers");
+        // console.log("Finished loadUsers");
     }
 
     // Define the event handler to handle the AJAX GET request
@@ -75,6 +86,7 @@ $(document).ready(function(){
         $('#message_typing_box').val('');
         // use the same callback function as the GET
         $.post('/api/rooms/1/messages', messageInput, loadMessages);
+        document.getElementById("message_typing_box").focus();
         // console.log("Finished sending AJAX for user_id " + messageInput.user_id + ": " + messageInput.data);
     }
 

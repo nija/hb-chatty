@@ -13,13 +13,13 @@
 
 <div class="container">
 	<div class="row row-offcanvas row-offcanvas-right">
-		<div class="col-xs-12 col-sm-9">
+		<div class="col-xs-12 col-sm-12 col-md-9">
 			<div class="row">
 
 <!-- Main table -->
 
 
-<table class="mainChatTable">
+<table class="table table-responsive mainChatTable">
 	<thead>
 		<tr>
 			<td><h3>Chat room</h3></td>
@@ -37,7 +37,7 @@
 					autofocus="True" 
 					maxlength="2040"
 					placeholder="Enter your message" />
-			<button id="message_typing_submit" class="btn btn-primary">Say it</button>
+			<button id="message_typing_submit" class="btn btn-primary btn-lg">Say it</button>
 		</td>
 	</tr>
 </table>
@@ -48,9 +48,7 @@
 
 
 <!-- Load the users block -->
-<br>
-<br>
-<div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+<div class="col-xs-10 col-sm-10 col-md-3 sidebar-offcanvas" id="sidebar">
   <div class="list-group">
   	<span class="list-group-item mainUserTable"> <h3>Companions</h3><br>
 		<span id="userList">
@@ -64,5 +62,5 @@
 	</div> <!-- row row-offcanvas row-offcanvas-right -->
 </div> <!-- container -->
 
-<script type="text/javascript" src="../static/js/moment.mn.js"></script>
+<script type="text/javascript" src="../static/js/moment.min.js"></script>
 {% endblock %}

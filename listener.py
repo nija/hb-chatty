@@ -96,7 +96,7 @@ class SparkleBot(Listener):
                     self.do_weather(event)
                 elif "story" in msg_data:
                     self.do_story(event)
-                elif "help" in msg_data:
+                elif "help" in msg_data or "halp" in msg_data:
                     self.do_help(event, event_keywords)
             else:
                 return
