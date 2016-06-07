@@ -9,11 +9,12 @@ import re
 import urllib
 import urllib2
 import pprint
+from threading import Timer
 from weather_api import WeatherAPI
+from netflixroulette_api import NetflixRouletteAPI
 from event import Event
 from bus import Bus
 from markov import Markov
-
 
 class Listener(object):
     """docstring for Listener"""
@@ -68,7 +69,7 @@ class SparkleBot(Listener):
             return
 
         # TODO: I feel the below code should work to find the function to call
-        # event_keywords = {"weather":['zipcode'], "story":[], "zombie":[]}
+        # event_keywords = {"weather":['zipcode'], "story":[], "help":[], "zombie":[]}
 
         # if msg_data.startswith(self.name):
         #     for method in event_keywords.keys():
@@ -84,14 +85,15 @@ class SparkleBot(Listener):
         #             self.me(event)
 
         # Generic politeness responses
-        if self.name in msg_data:
-            if msg_data.startswith(('hello', 'Hello', 'hi', 'Hi', 'Greetings', 'greetings', 'hiya', 'Hiya')):
+        if self.name.lower() in msg_data.lower():
+            if msg_data.startswith(('hello', 'Hello', 'hi', 'Hi', 'Greetings', 'greetings', 'hiya',
+                                    'Hiya')):
                 self.do_greeting(event)
             elif msg_data.startswith(('thank you', 'Thank you', 'thanks', 'Thanks', 'ty', 'TY')):
                 self.do_welcome_response(event)
 
             # Functional responses
-            elif msg_data.startswith(self.name):
+            elif msg_data.lower().startswith(self.name.lower()):
                 if "weather" in msg_data:
                     self.do_weather(event)
                 elif "story" in msg_data:
@@ -173,9 +175,12 @@ class SparkleBot(Listener):
             wr_main_temp_f,
             wr_weather_desc)
 
-        # return message
         # Post the response
         self.post_result(room_id, message)
+
+    def do_netflixr(self, search_term):
+        # http://netflixroulette.net/api/api.php?title=The%20Boondocks
+        pass
 
     def post_result(self, room_id, message):
         '''Posts a message back to the server using the API'''
@@ -190,15 +195,21 @@ class SparkleBot(Listener):
 
 class BabbleBot(Listener):
     """docstring for BabbleBot"""
-        
+    responses = ([
+                 ])
+
     def __init__(self, name, bus, user_id=1):
         self.name = name
         self.bus = bus
         self.user_id = user_id
-
+        self.timer = RepeatedTimer(1, hello, "World")
 
     def __repr__(self):
-        return "<{} {} {} {}>".format(type(self).__name__, self.name, self.user_id, self.server_path)
+        return "<{} {} {} {}>".format(
+                                      type(self).__name__,
+                                      self.name,
+                                      self.user_id,
+                                      self.server_path)
 
     def get_user_id(self):
         '''returns the user id SparkleBot is using, needed for responses'''
@@ -207,6 +218,9 @@ class BabbleBot(Listener):
     def set_user_id(self, user_id):
         '''adds a user id to SparkleBot, needed for responses'''
         self.user_id = user_id
+
+    def do_babble(self):
+        pass
 
     def post_result(self, room_id, message):
         '''Posts a message back to the server using the API'''
@@ -217,7 +231,7 @@ class BabbleBot(Listener):
         post_request = urllib2.Request(endpoint, data)
         post_response = urllib2.urlopen(post_request)
         response = post_response.read()
-        # print response
+        print response
 
 
 # GET request
@@ -240,6 +254,36 @@ class BabbleBot(Listener):
 # response = urllib2.urlopen(req)
 # d = response.read()
 # print d
+
+
+class RepeatedTimer(object):
+    '''General purpose utility timer using basic threading'''
+    def __init__(self, interval_in_seconds, function_to_call, *args, **kwargs):
+        self._timer = None
+        self.interval = interval_in_seconds
+        self.function = function_to_call
+        self.args = args
+        self.kwargs = kwargs
+        self.is_running = False
+        self.start()
+
+    def _run(self):
+        self.is_running = False
+        self.start()
+        self.function(*self.args, **self.kwargs)
+
+    def start(self):
+        if not self.is_running:
+            # Create a thread timer to keep close and private
+            self._timer = Timer(self.interval, self._run)
+            self._timer.start()
+            self.is_running = True
+
+    def stop(self):
+        self._timer.cancel()
+        self.is_running = False
+
+
 
 
 if __name__ == '__main__':
