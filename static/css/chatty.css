@@ -67,6 +67,12 @@ font-family: 'Exo', sans-serif;
 }
 
 /* Main chat page */
+.message_typing_row {
+	/*background-color: yellow;*/
+	margin-left: auto;
+	margin-right: auto;
+}
+
 
 .mainChatTable {
 	width: 100%;
@@ -75,18 +81,43 @@ font-family: 'Exo', sans-serif;
 	border-radius: 15px 100px 40px 5px;
 	margin-left: auto;
 	margin-right: auto;
-	/*margin-bottom: 20%;*/
     border-collapse: separate;
     border-spacing: 10px;
     word-break: break-word;
 }
 
+.mainChatTable:not(:last-child) {
+    word-break: break-word;
+    white-space: nowrap;
+}
+
+.mainChatTable:last-child{
+    width: 100%;
+}
+
 .mainChatInput {
-	width: 80%;
+	width: 65%;
+	height: 30px;
+	background-color: white; /*#0077B3;*/
+    transition: ease-in-out, height .25s ease-in-out;
+	margin-left: 10%;
+	margin-right: 0;
+	color: grey;
+}
+
+.mainChatInput:focus {
+    width: 75%;
+    height: 40px;
+	border-color: rgba(126, 239, 104, 0.6);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) inset, 0 0 8px rgba(126, 239, 104, 0.4);
+	outline: 0 none;
+	font-family: 'Bitter', sans-serif;
 }
 
 .mainChatSubmitBtn {
-	padding-right: 50px; 
+	align-self: right;
+	margin-left: 5%;
+	margin-right: 0;
 }
 
 .messageDate {
@@ -115,7 +146,7 @@ font-family: 'Exo', sans-serif;
 
 .userName {
 	font-family: 'Exo', sans-serif;	
-	color: grey;
+	color: #0077B3;
 }
 
 /* Healthcheck classes */
