@@ -8,11 +8,7 @@
 
 # Chatty
 
-Chatty is a web app, created by Nija Mashruwala, which is used to chat with other users and an interactive chat bot. Chatty is implemented with a microservice architecture pattern. The chat server uses a one-way Publish-Subscribe bus to communicate events to the bot, and the bot uses the chat server's RESTful API to return a response. 
-
-The chat bot uses the Wunderground API to display weather information by zipcode and the Open Movie Database API to display movie information. The chat bot can also generate natural language stories using Markov Chains. 
-
-The web app is close to production-ready in that monitoring hooks and healthcheck hooks exist, code coverage is around 80%, and continuous integratino has been set up. As the chat data is designed to be ephemeral, and the chat server will recreate the database schema when necessary, no data recovery steps are needed.
+Chatty is a web app, created by Nija Mashruwala, which is used to chat with other users and an interactive chat bot. It is designed to mimic most enterprise production web services.
 
 Learn more about the developer [here](https://www.linkedin.com/in/nmashruwala).
 
@@ -20,9 +16,9 @@ Learn more about the developer [here](https://www.linkedin.com/in/nmashruwala).
 - [Technologies Used](#technologiesused)
 - [Features](#features)
 - [Infrastucture](#infrastructure)
-- [REST API](#restapi)
+- [APIs](#apis)
 - [Event Bus](#eventbus)
-- [Monitoring and Healthchecks](#m-and-h)
+- [Reliability](#rely)
 
 ## <a name="technologiesused"></a>Technologies Used
 - [Python](https://www.python.org/)
@@ -58,16 +54,18 @@ Learn more about the developer [here](https://www.linkedin.com/in/nmashruwala).
 
 
 ## <a name="infrastructure"></a>Infrastructure
+Chatty is implemented with a microservice architecture pattern, and is buzzword-compliant. Because of the uncoupled design, it's trivial to separate the event bus or chatbot for placement on external hosts, or allocate a separate process to handle each component. As the chat data is designed to be ephemeral, and the chat server will recreate the database schema when necessary, no data recovery steps are needed.
 
+## <a name="apis"></a>APIs
+Chatty has a full-featured and robust REST API, which allows for functionality not seen on the front-end GUI, command-line interactions, and development of third-party custom clients. 
 
-## <a name="restapi"></a>REST API
-
+The chat bot uses the Wunderground API to display weather information by zipcode and the Open Movie Database API to display movie information. The chat bot can also generate natural language stories using Markov Chains. This implementation of the chat bot draws from Alice in Wonderland and Through the Looking Glass.
 
 ## <a name="eventbus"></a>Event Bus
+The chat server uses a one-way Publish-Subscribe bus to communicate events to the bot, and the bot uses the chat server's REST API to post a response. 
 
-
-## <a name="m-and-h"></a>Monitoring and Healthchecks
-
+## <a name="rely"></a>Reliability
+The web app is close to production-ready in that monitoring hooks and healthcheck hooks exist, code coverage is around 80%, and continuous integratino has been set up. The last steps are to lock down parts of the API, and set up continous deployment using Travis-CI and Heroku
 
 
 
