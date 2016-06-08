@@ -61,10 +61,10 @@ $(document).ready(function(){
 
     // Define the event handler to handle the AJAX GET request
     function loadUserList(evt) {
-        console.log("Starting loadUserList")
+        // console.log("Starting loadUserList")
         // AJAX call
         $.getJSON("/api/rooms/1/users",loadUsers);
-        console.log("Finished loadUserList")
+        // console.log("Finished loadUserList")
     }
 
     // =====================================================================
@@ -81,6 +81,7 @@ $(document).ready(function(){
         $('#message_typing_box').val('');
         // use the same callback function as the GET
         $.post('/api/rooms/1/messages', messageInput, loadMessages);
+        // reset focus to the input box
         document.getElementById("message_typing_box").focus();
         // console.log("Finished sending AJAX for user_id " + messageInput.user_id + ": " + messageInput.data);
     }
