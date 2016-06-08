@@ -11,7 +11,7 @@ import urllib2
 import pprint
 from threading import Timer
 from weather_api import WeatherAPI
-from netflixroulette_api import NetflixRouletteAPI
+from movie_api import MovieAPI
 from event import Event
 from bus import Bus
 from markov import Markov
@@ -59,6 +59,7 @@ class SparkleBot(Listener):
     def handle_event(self, event):
         event_keywords = {
             'weather': ['zipcode'],
+            'movie': ['title'],
             'story': [],
             'help': []}
         # print "SparkleBot is handling event {}".format(event)
@@ -98,6 +99,8 @@ class SparkleBot(Listener):
                     self.do_weather(event)
                 elif "story" in msg_data:
                     self.do_story(event)
+                elif "movie" in msg_data:
+                    self.do_movie(event)
                 elif "help" in msg_data or "halp" in msg_data:
                     self.do_help(event, event_keywords)
             else:
@@ -177,10 +180,57 @@ class SparkleBot(Listener):
 
         # Post the response
         self.post_result(room_id, message)
+        return message
 
-    def do_netflixr(self, search_term):
-        # http://netflixroulette.net/api/api.php?title=The%20Boondocks
-        pass
+    def do_movie(self, event):
+        # print "doin' le MOVIE"       
+        # pp = pprint.PrettyPrinter()
+        msg_data = event.data.get('data')
+        requestor_name = event.data.get('user_name')
+        room_id = event.data.get('room_id')
+        # Process the requested title
+        title_keywords = ' '.join(msg_data.split()[2:]).strip()
+        # pp.pprint(title_keywords)
+        # print "Parsing complete -", title_keywords
+        movie_response = MovieAPI.get_plot(title_keywords)
+        # pp.pprint(movie_response)
+
+    # {u'Actors': u'Jane Fonda, Lily Tomlin, Sam Waterston, Martin Sheen',
+    #  u'Awards': u'Nominated for 1 Golden Globe. Another 1 win & 14 nominations.',
+    #  u'Country': u'USA',
+    #  u'Director': u'N/A',
+    #  u'Genre': u'Comedy',
+    #  u'Language': u'English',
+    #  u'Metascore': u'N/A',
+    #  u'Plot': u'Finding out that their husbands are not just work partners, but have also been romantically involved for the last 20 years, two women with an already strained relationship try to cope with the circumstances together.',
+    #  u'Poster': u'http://ia.media-imdb.com/images/M/MV5BMTgwNTkyOTIwOF5BMl5BanBnXkFtZTgwMDg0MTQ1ODE@._V1_SX300.jpg',
+    #  u'Rated': u'TV-MA',
+    #  u'Released': u'08 May 2015',
+    #  u'Response': u'True',
+    #  u'Runtime': u'30 min',
+    #  u'Title': u'Grace and Frankie',
+    #  u'Type': u'series',
+    #  u'Writer': u'Marta Kauffman, Howard J. Morris',
+    #  u'Year': u'2015\u2013',
+    #  u'imdbID': u'tt3609352',
+    #  u'imdbRating': u'8.1',
+    #  u'imdbVotes': u'9,416'}
+        movie_title = movie_response.get('Title')
+        movie_writer = movie_response.get('Writer').split(',')[0]
+        movie_plot = movie_response.get('Plot').strip()
+
+        # Create the response payload
+        message = "{}, '{}' was primarily written by {} and the plot summary is: {}".format(
+            requestor_name,
+            movie_title,
+            movie_writer,
+            movie_plot)
+
+        # pp.pprint(message)
+
+        # Post the response
+        self.post_result(room_id, message)
+        return message
 
     def post_result(self, room_id, message):
         '''Posts a message back to the server using the API'''
@@ -231,7 +281,7 @@ class BabbleBot(Listener):
         post_request = urllib2.Request(endpoint, data)
         post_response = urllib2.urlopen(post_request)
         response = post_response.read()
-        print response
+        # print response
 
 
 # GET request
@@ -290,13 +340,18 @@ if __name__ == '__main__':
     bus = Bus()
     sparkle = SparkleBot("sparkle", bus)
 
-    event1 = Event(
+    weather_event = Event(
                    Event.Types.message_created_event,
-                   {"room_id":1, "data": "Pyro weather 94301", "user_id": 123})
+                   {"room_id":1, "data": "Pyro weather 94301", 'user_name': 'Balloonicorn', "user_id": 1})
+    w_out = sparkle.do_weather(weather_event)
+    print w_out
 
-    out = sparkle.do_weather(event1)
 
-    print out
+    movie_event = Event(
+                   Event.Types.message_created_event,
+                   {"room_id":1, "data": "Pyro movie grace and frankie", 'user_name': 'Balloonicorn', "user_id": 1})
+    m_out = sparkle.do_movie(movie_event)
+    print m_out
 
 
 
