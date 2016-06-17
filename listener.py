@@ -41,7 +41,7 @@ class SparkleBot(Listener):
         self.user_id = user_id
         self.marky = Markov(
             limit = 600,
-            ngram = 7,
+            ngram = 6,
             paths = ['static/markov_text/alice_in_wonderland.txt',
                     'static/markov_text/through_the_looking_glass.txt'])
 
