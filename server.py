@@ -331,12 +331,13 @@ def show_user_messages(user_id):
 
 if __name__ == "__main__":
 
-    # Connect to the database
+    # Figure out which db to connect to
+    db_uri = os.environ.get("CHATTY_DB_URI","postgres:///travis_ci_test")
     # Test
     #connect_to_db(app, db_uri="postgresql:///travis_ci_test")
-    connect_to_db(app)
     # Prod
     #connect_to_db(app, db_uri="postgresql:///chatty")
+    connect_to_db(app, db_uri)
 
     # Override the default JSONEncoder so the custom one knows how to handle
     # our classes
@@ -376,10 +377,13 @@ if __name__ == "__main__":
     app.debug = True
     # app.debug = False
 
+    # Set the port
+    port = int(os.environ.get("CHATTY_PORT", 5001))
+
     # Allow more processes so there's enough wiggle room to handle multiple requests
     # Use the DebugToolbar
     # DebugToolbarExtension(app)
-    app.run(host="0.0.0.0", port=5001, processes=3)
+    app.run(host="0.0.0.0", port=port, processes=3)
 
 
 
