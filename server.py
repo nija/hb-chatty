@@ -332,7 +332,7 @@ def show_user_messages(user_id):
 if __name__ == "__main__":
 
     # Figure out which db to connect to
-    db_uri = os.environ.get("CHATTY_DB_URI","postgres:///travis_ci_test")
+    db_uri = os.environ.get("DATABASE_URL","postgres:///travis_ci_test")
     # Test
     #connect_to_db(app, db_uri="postgresql:///travis_ci_test")
     # Prod
@@ -374,11 +374,12 @@ if __name__ == "__main__":
     # Leave this as is because of the 'No handlers could be found for logger
     # "sqlalchemy.pool.QueuePool"' http 500 error that results when it is taken
     # out
-    app.debug = True
-    # app.debug = False
+    DEBUG = "NO_DEBUG" not in os.environ
+    # app.debug = True
+    app.debug = DEBUG
 
     # Set the port
-    port = int(os.environ.get("CHATTY_PORT", 5001))
+    port = int(os.environ.get("PORT", 5001))
 
     # Allow more processes so there's enough wiggle room to handle multiple requests
     # Use the DebugToolbar
