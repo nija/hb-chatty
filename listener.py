@@ -18,7 +18,9 @@ from markov import Markov
 
 class Listener(object):
     """docstring for Listener"""
-    server_path = 'http://localhost:5001/api'
+    port = int(os.environ.get("PORT", 5001))
+    server_path = 'http://localhost:{}/api'.format(port)
+    
     def __init__(self, bus):
 
         return
