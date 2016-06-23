@@ -216,8 +216,13 @@ class Room(db.Model):
         check_join = RoomUser.query.filter(
                         RoomUser.room_id == self.room_id,
                         RoomUser.user_id == user_id)
+        print "check_join: " + str(check_join) 
+        print "room_id: " + str(self.room_id)
+        print "user_id: " + str(user_id)
         if check_join.first():
+            print "we dont get here 1"
             return True
+        print "we dont get here 2"
         return False
 
 
@@ -491,7 +496,7 @@ def connect_to_db(app, db_uri="postgresql:///chatty"):
     '''
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # app.config['SQLALCHEMY_ECHO'] = True
+    app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
 

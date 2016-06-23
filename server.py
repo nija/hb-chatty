@@ -22,8 +22,20 @@ from model import Message, MyJSONEncoder, Room, User, connect_to_db, db, seed_on
 #TODO: Add loggers
 # import logging
 # from logging.handlers import RotatingFileHandler
+import sys
+import logging
+LOG_FILENAME = 'chatty.log'
+logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+
+logging.debug('This message should go to the log file')
 
 
+
+# shandler = logging.StreamHandler()
+# shandler.setLevel(logging.DEBUG)
+# app.logger.addHandler(shandler)
+# logging.config.fileConfig('logging.conf')
 
 
 
@@ -37,6 +49,22 @@ app.secret_key = 'BalloonicornSmash'
 # Normally, if you use an undefined variable in Jinja2, it fails silently.
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
+
+# Set up logging
+# Create logger
+logger = logging.getLogger("simple_example")
+logger.setLevel(logging.DEBUG)
+# Create console handler and set level to debug
+console_logger = logging.StreamHandler()
+console_logger.setLevel(logging.DEBUG)
+# Create formatter
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# Add formatter to console_logger
+console_logger.setFormatter(formatter)
+# Add console_logger to logger
+logger.addHandler(console_logger)
+app.logger.addHandler(logger)
+
 
 # Create an event bus
 bus = Bus()
@@ -329,6 +357,9 @@ def show_user_messages(user_id):
 #         self.app = app
 #         self.bus = bus
 
+
+
+# ====== Main Application ======
 if __name__ == "__main__":
 
     # Figure out which db to connect to
@@ -337,6 +368,7 @@ if __name__ == "__main__":
     #connect_to_db(app, db_uri="postgresql:///travis_ci_test")
     # Prod
     #connect_to_db(app, db_uri="postgresql:///chatty")
+    print "\n      {}\n\n".format(db_uri)
     connect_to_db(app, db_uri)
 
     # Override the default JSONEncoder so the custom one knows how to handle
@@ -346,22 +378,28 @@ if __name__ == "__main__":
     # Create our data schema and default objects if needed
     seed_once(app)
 
-
     # Tell our sparklebot which user to post messages as and which room
     # to frequent
     default_room = db.session.query(Room).get(1)
+    print "1:" + str(default_room.as_json())
+    
     # Get the sparklebot user object, creating it if need be
     sparklebot_check = User.query.filter(User.name == sparklebot_name)
+    print "2:" + str(sparklebot_check)
     if not sparklebot_check.first():
+        print "3:" + str(sparklebot_check.first())
         # print "\n\n\nCREATING SPARKLE BOT DB USER\n\n\n"
         # Create the user
         db.session.add(User(sparklebot_name))
         db.session.commit()
     sparklebot_user = sparklebot_check.first()
+    print "4:" + str(sparklebot_user.as_json())
+
     sparklebot.set_user_id(sparklebot_user.user_id)
+    print "5:" + str(sparklebot_check)
     # Add the user to the room if needed
     if not default_room.contains_user(sparklebot_user.user_id):
-        # print "\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n"
+        print "\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n"
         db.session.add(default_room.join_room(sparklebot_user))
         db.session.commit()
 
@@ -376,10 +414,10 @@ if __name__ == "__main__":
     # out
     DEBUG = "NO_DEBUG" not in os.environ
     # app.debug = True
-    app.debug = DEBUG
+    app.debug = False
 
     # Set the port
-    port = int(os.environ.get("PORT", 5001))
+    port = int(os.environ.get("PORT", 5014))
 
     # Allow more processes so there's enough wiggle room to handle multiple requests
     # Use the DebugToolbar
