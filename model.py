@@ -494,7 +494,7 @@ def connect_to_db(app, db_uri="postgresql:///chatty"):
     Configure the database-app connection
     Takes an app and an optional db_uri
     '''
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://pnwnmfjpyivbro:KiitLk6Esmjwixeh8-sR52RC5e@ec2-23-21-100-145.compute-1.amazonaws.com:5432/d7c70pc1jb72s7'
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
