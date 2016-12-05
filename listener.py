@@ -8,13 +8,13 @@ import os
 import re
 import urllib
 import urllib2
-import pprint
 from threading import Timer
 from weather_api import WeatherAPI
 from movie_api import MovieAPI
 from event import Event
 from bus import Bus
 from markov import Markov
+from model import Message, Room, User, db
 
 class Listener(object):
     """docstring for Listener"""
@@ -236,14 +236,13 @@ class SparkleBot(Listener):
 
     def post_result(self, room_id, message):
         '''Posts a message back to the server using the API'''
-        endpoint = "{}/rooms/{}/messages".format(self.server_path, room_id)
-        values = {'user_id': '{}'.format(self.user_id), 'data': message}
-        data = urllib.urlencode(values)
-        # print "\n\n\nPosting {} to {} with uid {}\n\n\n".format(data, endpoint, self.user_id)
-        post_request = urllib2.Request(endpoint, data)
-        post_response = urllib2.urlopen(post_request)
-        response = post_response.read()
-        # print response
+        user = db.session.query(User).get(3)
+        room = db.session.query(Room).get(room_id)
+        msg = Message(user=user, room=room, data=message)
+
+        # Create the date fields using the database
+        db.session.add(msg)
+        db.session.commit()
 
 class BabbleBot(Listener):
     """docstring for BabbleBot"""

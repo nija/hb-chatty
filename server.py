@@ -363,7 +363,7 @@ def show_user_messages(user_id):
 if __name__ == "__main__":
 
     # Figure out which db to connect to
-    db_uri = os.environ.get("DATABASE_URL","postgres:///travis_ci_test")
+    db_uri = os.environ.get("DATABASE_URL","postgres://postgres:postgres@localhost:5432/travis_ci_test")
     # Test
     #connect_to_db(app, db_uri="postgresql:///travis_ci_test")
     # Prod
@@ -422,7 +422,7 @@ if __name__ == "__main__":
     # Allow more processes so there's enough wiggle room to handle multiple requests
     # Use the DebugToolbar
     # DebugToolbarExtension(app)
-    app.run(host="0.0.0.0", port=port, processes=3)
+    app.run(host="0.0.0.0", port=port, processes=1)
 
 
 
