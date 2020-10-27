@@ -50,8 +50,9 @@ Learn more about the developer [here](https://www.linkedin.com/in/nmashruwala).
 
 *Future*
 
-- [ ] Users will be able to tell Chatbot to remind them of events
+- [ ] Upgrade to Python3
 - [ ] The app will go through basic security hardening
+- [ ] Users will be able to tell Chatbot to remind them of events
 - [ ] GUI will have a log in flow
 - [ ] Data rentention is enforced
 
