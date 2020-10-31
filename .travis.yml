@@ -1,10 +1,10 @@
 language: python
 python:
-  - "2.7"
+  - "3.9"
 # command to install dependencies
 install: 
-  - pip install -r requirements.txt
-  - pip install coveralls
+  - pip3 install -r requirements.txt
+  - pip3 install coveralls
 services:
   - postgresql
 # command to run tests

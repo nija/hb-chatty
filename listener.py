@@ -7,7 +7,7 @@ StoryBot
 import os
 import re
 import urllib
-import urllib2
+import pprint
 from threading import Timer
 from weather_api import WeatherAPI
 from movie_api import MovieAPI
@@ -243,6 +243,15 @@ class SparkleBot(Listener):
         # Create the date fields using the database
         db.session.add(msg)
         db.session.commit()
+        endpoint = "{}/rooms/{}/messages".format(self.server_path, room_id)
+        values = {'user_id': '{}'.format(self.user_id), 'data': message}
+        data = urllib.urlencode(values)
+        # print("\n\n\nPosting {} to {} with uid {}\n\n\n".format(data, endpoint, self.user_id))
+        post_request = urllib.Request(endpoint, data)
+        post_response = urllib.urlopen(post_request)
+        response = post_response.read()
+        # print(response)
+
 
 class BabbleBot(Listener):
     """docstring for BabbleBot"""
@@ -345,14 +354,14 @@ if __name__ == '__main__':
                    Event.Types.message_created_event,
                    {"room_id":1, "data": "Pyro weather 94301", 'user_name': 'Balloonicorn', "user_id": 1})
     w_out = sparkle.do_weather(weather_event)
-    print w_out
+    print(w_out)
 
 
     movie_event = Event(
                    Event.Types.message_created_event,
                    {"room_id":1, "data": "Pyro movie grace and frankie", 'user_name': 'Balloonicorn', "user_id": 1})
     m_out = sparkle.do_movie(movie_event)
-    print m_out
+    print(m_out)
 
 
 

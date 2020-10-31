@@ -34,5 +34,5 @@ if __name__ == '__main__':
     event2 = Event(
                    Event.Types.user_joins_room_event, 
                    {"user_id":1, "room_id":2})
-    print event1
-    print event2
+    print(event1)
+    print(event2)

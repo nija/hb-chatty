@@ -2,7 +2,6 @@
 # pylint: disable=I0011,C0103
 import json
 import urllib
-import urllib2
 
 class WeatherAPI(object):
     """docstring for WeatherAPI"""
@@ -15,7 +14,7 @@ class WeatherAPI(object):
         # Wunderground call
         uri = "http://api.wunderground.com/api/{}/conditions/q/{}.json".format(api_key, location)
         # print "WeatherAPI uri: ", uri
-        response = urllib2.urlopen(uri)
+        response = urllib.urlopen(uri)
         # print dir(response)
         resp = json.loads(response.read())
 

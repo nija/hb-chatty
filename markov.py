@@ -119,4 +119,5 @@ if __name__ == '__main__':
         paths = ['static/markov_text/alice_in_wonderland.txt',
                 'static/markov_text/through_the_looking_glass.txt'])
 
-    print marky.tell_a_story()
+    print(marky.tell_a_story())
+    

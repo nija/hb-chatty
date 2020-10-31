@@ -11,7 +11,7 @@ import pprint
 # Flask and related imports
 from jinja2 import StrictUndefined
 from flask import Flask, jsonify, render_template, redirect, request, flash, send_from_directory, session
-# from flask_debugtoolbar import DebugToolbarExtension
+from flask_debugtoolbar import DebugToolbarExtension
 # Custom imports
 from bus import Bus
 from event import Event
@@ -233,7 +233,7 @@ def create_room_message(room_id):
     db.session.commit()
 
     # Put the event on the bus
-    print "Throwing message_created_event"
+    print("Throwing message_created_event")
     bus.notify(Event(
         Event.Types.message_created_event, 
         msg.as_json()))
@@ -270,7 +270,7 @@ def create_room_users(room_id):
         db.session.commit()
 
         # Put the event on the bus
-        print "Throwing user_joins_room"
+        print("Throwing user_joins_room")
         bus.notify(Event(
             Event.Types.user_joins_room_event, 
             {   'user_id':user.user_id,
@@ -367,8 +367,8 @@ if __name__ == "__main__":
     # Test
     #connect_to_db(app, db_uri="postgresql:///travis_ci_test")
     # Prod
-    #connect_to_db(app, db_uri="postgresql:///chatty")
-    print "\n      {}\n\n".format(db_uri)
+    connect_to_db(app, db_uri="postgresql:///chatty")
+    print("\n      {}\n\n".format(db_uri))
     connect_to_db(app, db_uri)
 
     # Override the default JSONEncoder so the custom one knows how to handle
@@ -381,40 +381,40 @@ if __name__ == "__main__":
     # Tell our sparklebot which user to post messages as and which room
     # to frequent
     default_room = db.session.query(Room).get(1)
-    print "1:" + str(default_room.as_json())
+    print("1:" + str(default_room.as_json()))
     
     # Get the sparklebot user object, creating it if need be
     sparklebot_check = User.query.filter(User.name == sparklebot_name)
-    print "2:" + str(sparklebot_check)
+    print("2:" + str(sparklebot_check))
     if not sparklebot_check.first():
-        print "3:" + str(sparklebot_check.first())
+        print("3:" + str(sparklebot_check.first()))
         # print "\n\n\nCREATING SPARKLE BOT DB USER\n\n\n"
         # Create the user
         db.session.add(User(sparklebot_name))
         db.session.commit()
     sparklebot_user = sparklebot_check.first()
-    print "4:" + str(sparklebot_user.as_json())
+    print("4:" + str(sparklebot_user.as_json()))
 
     sparklebot.set_user_id(sparklebot_user.user_id)
-    print "5:" + str(sparklebot_check)
+    print("5:" + str(sparklebot_check))
     # Add the user to the room if needed
     if not default_room.contains_user(sparklebot_user.user_id):
-        print "\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n"
+        print("\n\n\nADDING SPARKLE BOT TO DEFAULT ROOM\n\n\n")
         db.session.add(default_room.join_room(sparklebot_user))
         db.session.commit()
 
 
     # Right now, we only have one room and one user in that room
 
-    print "\n    HEREEEEE!\n\n"
+    print("\n    HEREEEEE!\n\n")
 
     # DebugToolbarExtension requires debug=True before it will run correctly
     # Leave this as is because of the 'No handlers could be found for logger
     # "sqlalchemy.pool.QueuePool"' http 500 error that results when it is taken
     # out
     DEBUG = "NO_DEBUG" not in os.environ
-    # app.debug = True
-    app.debug = False
+    app.debug = True
+    # app.debug = False
 
     # Set the port
     port = int(os.environ.get("PORT", 5014))

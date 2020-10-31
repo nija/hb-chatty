@@ -1,4 +1,5 @@
-from flask.ext.sqlalchemy import SQLAlchemy
+# from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.inspection import inspect
 from datetime import datetime, timedelta
 from pytz import timezone
@@ -216,13 +217,13 @@ class Room(db.Model):
         check_join = RoomUser.query.filter(
                         RoomUser.room_id == self.room_id,
                         RoomUser.user_id == user_id)
-        print "check_join: " + str(check_join) 
-        print "room_id: " + str(self.room_id)
-        print "user_id: " + str(user_id)
+        print("check_join: " + str(check_join) )
+        print("room_id: " + str(self.room_id) )
+        print("user_id: " + str(user_id) )
         if check_join.first():
-            print "we dont get here 1"
+            print("we dont get here 1")
             return True
-        print "we dont get here 2"
+        print("we dont get here 2")
         return False
 
 
@@ -303,7 +304,7 @@ def seed_once(app):
     # Check to see if the table exists; 0 means to recreate everything
     if row[0] == 0:
         #import pdb; pdb.set_trace()
-        # print "\n\n\tCreating the world\n\n"
+        # print("\n\n\tCreating the world\n\n")
         db.create_all()
 
         # Create our default room
@@ -330,11 +331,11 @@ def seed_once(app):
         db.session.add(main_room.join_room(balloonicorn))
         db.session.add(main_room.join_room(anonymouse))
         db.session.commit()
-        # print "\n\n\tOur world is complete!\n\n"
+        # print("\n\n\tOur world is complete!\n\n")
         # print balloonicorn, balloonicorn.rooms
 
     # else:      
-        # print "\n\n\tOur world EXISTS!\n\tnothing to do!\n\n"
+        # print("\n\n\tOur world EXISTS!\n\tnothing to do!\n\n")
 
 
 # Force a clean slate
@@ -367,7 +368,7 @@ def test_create_get_users(app):
 
 def test_get_users(app):
     users = User.query.all()
-    print "Users:\n", users
+    print("Users:\n", users)
 
 def test_join_room(app):
     check_fran = User.query.filter(User.name == 'Fran Allen')
@@ -375,13 +376,13 @@ def test_join_room(app):
     # If Fran Allen doesn't exist
     if not check_fran.first():
         # Create Fran Allen
-        print "Creating Fran Allen"
+        print("Creating Fran Allen")
         fran = User(name='Fran Allen')
         db.session.add(fran)
         db.session.commit()
 
     main_room = db.session.query(Room).get(1)
-    print "Got room {}".format(main_room)
+    print("Got room {}".format(main_room) )
     fran = User.query.filter(User.name == 'Fran Allen').first()
     # If the user is not already in the room
     if not main_room.contains_user(fran.user_id):
@@ -389,14 +390,14 @@ def test_join_room(app):
         db.session.add(main_room.join_room(fran))
         # db.session.add(main_room.join_room(balloonicorn))
         db.session.commit()
-    print 'Room: {}\nUsers: {}'.format(main_room.room_id, main_room.users_as_json())
+    print('Room: {}\nUsers: {}'.format(main_room.room_id, main_room.users_as_json()))
 
 def test_get_rooms(app):
     ''' '''
     rooms = Room.query.all()
     room_users = RoomUser.query.all()
-    print rooms
-    print room_users
+    print(rooms)
+    print(room_users)
 
 def test_create_get_messages(app):
 
@@ -466,24 +467,24 @@ def test_example_data(app, db_uri):
     #######
     # Test relationships
 
-    print "User Messages\n=================================\n"
+    print("User Messages\n=================================\n")
     users = User.query.all()
     for user in users:
-        print "user.messages: ", user.messages
-        print "user.rooms: ", user.rooms
+        print("user.messages: ", user.messages)
+        print("user.rooms: ", user.rooms)
 
 
-    print "\n\nRoom Messages\n=================================\n"
+    print("\n\nRoom Messages\n=================================\n")
     rooms = Room.query.all()
     for room in rooms:
-        print "room.messages: ", room.messages
-        print "room users: ", room.users
+        print("room.messages: ", room.messages)
+        print("room users: ", room.users)
 
 
-    print "\n\nAssociations\n=================================\n"
+    print("\n\nAssociations\n=================================\n")
     room_users = RoomUser.query.all()
     for room_user in room_users:
-        print "room_user: ", room_user
+        print("room_user: ", room_user)
 #====
 
 
@@ -511,6 +512,6 @@ if __name__ == '__main__':
     test_example_data(app, db_uri="postgresql:///chatty")
     # test_seed_once(app, db_uri="postgresql:///chatty")
     # connect_to_db(app, db_uri="postgresql:///chatty")
-    print "Connected to DB."
+    print("Connected to DB.")
 
 
