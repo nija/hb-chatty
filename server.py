@@ -363,11 +363,12 @@ def show_user_messages(user_id):
 if __name__ == "__main__":
 
     # Figure out which db to connect to
-    db_uri = os.environ.get("DATABASE_URL","postgres://postgres:postgres@localhost:5432/travis_ci_test")
+    # db_uri = os.environ.get("DATABASE_URL","postgres://postgres:postgres@localhost:5432/travis_ci_test")
     # Test
     #connect_to_db(app, db_uri="postgresql:///travis_ci_test")
     # Prod
-    connect_to_db(app, db_uri="postgresql:///chatty")
+    # connect_to_db(app, db_uri="postgresql:///chatty")
+    db_uri="postgresql:///chatty"
     print("\n      {}\n\n".format(db_uri))
     connect_to_db(app, db_uri)
 
