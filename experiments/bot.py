@@ -2,7 +2,6 @@
 # pylint: disable=I0011,C0103
 import json
 import urllib
-import urllib2
 import random
 
 # response = urllib2.urlopen('http://localhost:5001/api/users')
@@ -19,13 +18,13 @@ bot_responses = ["PYROOOOOOOO!"]
 
 def get_user_info():
 
-    response = urllib2.urlopen('{}/users'.format(server_path))
+    response = urllib.urlopen('{}/users'.format(server_path))
     jason = json.loads(response.read())
     j_list = jason["users"]
     for index, person in enumerate(j_list):
         if person["name"] == bot_name:
             bot_user_id = person["user_id"]
-            print index, ": ", person
+            print(index, ": ", person)
 
 # If the user doesn't exist, create it
 # curl --data "name=Pyro" http://localhost:5001/api/users
@@ -38,7 +37,7 @@ def get_chat_history_all():
     '''Gets all messages'''
     room_id = 1
     room_attr = "messages"
-    response = urllib2.urlopen('{}/rooms/{}/{}'.format(
+    response = urllib.urlopen('{}/rooms/{}/{}'.format(
                        server_path, room_id, room_attr))
     jason = json.loads(response.read())
     j_list = jason[room_attr]
@@ -57,7 +56,7 @@ def parse_chat_message(json_message):
     '''Takes a single JSON messages and acts upon it. 
     Responds to:
     '''
-    print type(json_message), json_message
+    print(type(json_message), json_message)
     msg_data = json_message["data"]
     print msg_data
     if bot_name in msg_data and bot_name != json_message["user_name"]:
@@ -83,7 +82,7 @@ def post_chat_message(chat_message):
 
     values = {'user_id': user_id, 'data': chat_message }
     data = urllib.urlencode(values)
-    print data
+    print(data)
     # post_response = urllib2.urlopen('{}/rooms/{}/{}'.format(
        #                  server_path, room_id, room_attr),
     #                   data)

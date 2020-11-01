@@ -83,14 +83,14 @@ if __name__ == "__main__":
     #connect_to_db(app, db_uri="postgresql:///travis_ci_test")
     # Prod
     #connect_to_db(app, db_uri="postgresql:///chatty")
-    print "\n      {}\n\n".format(db_uri)
+    print("\n      {}\n\n".format(db_uri))
     logging.debug(db_uri)
     # connect_to_db(app, db_uri)
 
 
     # Right now, we only have one room and one user in that room
 
-    print "\n    HEREEEEE!\n\n"
+    print("\n    HEREEEEE!\n\n")
 
     # DebugToolbarExtension requires debug=True before it will run correctly
     # Leave this as is because of the 'No handlers could be found for logger
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     DEBUG = "NO_DEBUG" not in os.environ
     # app.debug = True
     app.debug = DEBUG
-    print "debug: {}".format(DEBUG)
+    print("debug: {}".format(DEBUG))
     logging.debug("debug: {}".format(DEBUG))
 
     # Set the port

@@ -6,7 +6,7 @@ StoryBot
 
 import os
 import re
-import urllib
+import urllib, urllib.parse, urllib.request
 import pprint
 from threading import Timer
 from weather_api import WeatherAPI
@@ -39,6 +39,8 @@ class SparkleBot(Listener):
         # self.api_key = "&APPID={}".format(os.environ.get('APPID'))
         # For Wunderground API key
         self.api_key = os.environ.get('WUNDERGROUND_API_KEY')
+        # For OpenMovie API key
+        self.om_api_key = os.environ.get('OPENMOVIE_API_KEY')
         # self.server_path = 'http://localhost:5001/api'
         self.user_id = user_id
         self.marky = Markov(
@@ -194,7 +196,7 @@ class SparkleBot(Listener):
         title_keywords = ' '.join(msg_data.split()[2:]).strip()
         # pp.pprint(title_keywords)
         # print "Parsing complete -", title_keywords
-        movie_response = MovieAPI.get_plot(title_keywords)
+        movie_response = MovieAPI.get_plot(self.om_api_key, title_keywords)
         # pp.pprint(movie_response)
 
     # {u'Actors': u'Jane Fonda, Lily Tomlin, Sam Waterston, Martin Sheen',
@@ -245,10 +247,10 @@ class SparkleBot(Listener):
         db.session.commit()
         endpoint = "{}/rooms/{}/messages".format(self.server_path, room_id)
         values = {'user_id': '{}'.format(self.user_id), 'data': message}
-        data = urllib.urlencode(values)
+        data = urllib.parse.urlencode(values)
         # print("\n\n\nPosting {} to {} with uid {}\n\n\n".format(data, endpoint, self.user_id))
         post_request = urllib.Request(endpoint, data)
-        post_response = urllib.urlopen(post_request)
+        post_response = urllib.request.urlopen(post_request)
         response = post_response.read()
         # print(response)
 

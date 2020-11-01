@@ -1,7 +1,7 @@
 '''Artisinal chat bot'''
 # pylint: disable=I0011,C0103
 import json
-import urllib2
+import urllib
 #from unittest import TestCase
 from flask import Flask, jsonify
 from flask.ext.webtest import TestApp
@@ -39,7 +39,7 @@ class Chattybot(TestApp):
     def get_chat_history_all(self):
         '''Gets all messages'''
         # if there is a new message, parse it
-        print self.get('/api/rooms/1/messages')
+        print(self.get('/api/rooms/1/messages'))
 
         # test_app = TestApp(app)
         # resp = test_app.get('/admin')
@@ -48,7 +48,7 @@ class Chattybot(TestApp):
    def get_chat_history_by_time(self):
         '''Checks for a new chat message'''
         # if there is a new message, parse it
-        print self.get('/api/rooms/1/messages')
+        print(self.get('/api/rooms/1/messages'))
 
         # test_app = TestApp(app)
         # resp = test_app.get('/admin')
