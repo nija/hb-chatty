@@ -2,4 +2,4 @@
 *.pyc
 .coveralls.yml
 .env_vars
-*.log
+chatty.log

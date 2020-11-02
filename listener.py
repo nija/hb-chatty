@@ -37,8 +37,8 @@ class SparkleBot(Listener):
         # Set the weather API key from env vars
         # For openweathermap API key
         # self.api_key = "&APPID={}".format(os.environ.get('APPID'))
-        # For Wunderground API key
-        self.api_key = os.environ.get('WUNDERGROUND_API_KEY')
+        # For OpenWeatherMap API key
+        self.api_key = os.environ.get('OPENWEATHER_API_KEY')
         # For OpenMovie API key
         self.om_api_key = os.environ.get('OPENMOVIE_API_KEY')
         # self.server_path = 'http://localhost:5001/api'
