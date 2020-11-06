@@ -217,13 +217,13 @@ class Room(db.Model):
         check_join = RoomUser.query.filter(
                         RoomUser.room_id == self.room_id,
                         RoomUser.user_id == user_id)
-        print("check_join: " + str(check_join) )
-        print("room_id: " + str(self.room_id) )
-        print("user_id: " + str(user_id) )
+        # print("check_join: " + str(check_join) )
+        # print("room_id: " + str(self.room_id) )
+        # print("user_id: " + str(user_id) )
         if check_join.first():
-            print("we dont get here 1")
+            print("room_id {} contains user_id {}".format(self.room_id, user_id))
             return True
-        print("we dont get here 2")
+        print("room_id {} does not contain user_id {}".format(self.room_id, user_id))
         return False
 
 
@@ -304,7 +304,7 @@ def seed_once(app):
     # Check to see if the table exists; 0 means to recreate everything
     if row[0] == 0:
         #import pdb; pdb.set_trace()
-        # print("\n\n\tCreating the world\n\n")
+        print("\n\n\tCreating the world\n\n")
         db.create_all()
 
         # Create our default room
@@ -331,21 +331,21 @@ def seed_once(app):
         db.session.add(main_room.join_room(balloonicorn))
         db.session.add(main_room.join_room(anonymouse))
         db.session.commit()
-        # print("\n\n\tOur world is complete!\n\n")
+        print("\n\n\tOur world is complete!\n\n")
         # print balloonicorn, balloonicorn.rooms
 
-    # else:      
-        # print("\n\n\tOur world EXISTS!\n\tnothing to do!\n\n")
+    else:      
+        print("\n\n\tOur world EXISTS!\n\tNothing to do!\n\n")
 
 
 # Force a clean slate
 def seed_force(app):
     # Make sure nothing exists
-    # print 'dropping'
+    print('dropping the world')
     db.drop_all()
     # print 'seed once...'
     seed_once(app)
-    # print 'finished seed once'
+    print('finished seed once')
 
 def test_seed_once(app, db_uri):
     '''Create example data for the test database.'''
@@ -497,7 +497,7 @@ def connect_to_db(app, db_uri="postgresql:///chatty"):
     '''
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_ECHO'] = True
+    app.config['SQLALCHEMY_ECHO'] = False
     db.app = app
     db.init_app(app)
 

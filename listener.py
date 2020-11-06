@@ -18,7 +18,8 @@ from model import Message, Room, User, db
 
 class Listener(object):
     """docstring for Listener"""
-    port = int(os.environ.get("PORT", 5001))
+    # port = int(os.environ.get("PORT", 5001))
+    port = int(os.environ.get("PORT", 5014))
     server_path = 'http://localhost:{}/api'.format(port)
     
     def __init__(self, bus):
@@ -62,7 +63,7 @@ class SparkleBot(Listener):
 
     def handle_event(self, event):
         event_keywords = {
-            'weather': ['zipcode'],
+            'weather': ['location'],
             'movie': ['title'],
             'story': [],
             'help': []}
@@ -74,7 +75,7 @@ class SparkleBot(Listener):
             return
 
         # TODO: I feel the below code should work to find the function to call
-        # event_keywords = {"weather":['zipcode'], "story":[], "help":[], "zombie":[]}
+        # event_keywords = {"weather":['location'], "story":[], "help":[], "zombie":[]}
 
         # if msg_data.startswith(self.name):
         #     for method in event_keywords.keys():
@@ -149,17 +150,29 @@ class SparkleBot(Listener):
 
     def do_weather(self, event):
         '''Parse and handle the weather requested event'''
+
+        # pp = pprint.PrettyPrinter()
         msg_data = event.data.get("data")
         requestor_name = event.data.get("user_name")
         room_id = event.data.get("room_id")
-        pattern = "^(.*)\s(.*)\s(\d*)"
-        groups = re.findall(pattern, msg_data)
-        location = groups[0][2]
+        # pp.pprint(msg_data)
+        # Pop off the first two words ("Pyro weather")
+        bot, _, loc = msg_data.partition(" ")
+        # pp.pprint(bot)
+        # pp.pprint(cmd)
+        # pp.pprint(loc)
+        cmd,_, location = loc.partition(" ")
+        # pp.pprint(location)
+        # pattern = "^(.*)\s(.*)\s(\d*)"
+        # groups = re.findall(pattern, msg_data)
+        # pp.pprint(groups)
+        # location = groups[0][2]
+        # location = "Alameda, CA, USA"
         weather_response = WeatherAPI.get_weather(self.api_key, location)
+        # pp.pprint(weather_response)
+        # pp.pprint(location)
 
         # Parsing for OpenWeatherMap
-        # pp = pprint.PrettyPrinter()
-        # pp.pprint(weather_response)
         # wr_city = weather_response["name"]
         # wr_main = weather_response["main"]
         # wr_main_temp = wr_main["temp"]
@@ -168,19 +181,25 @@ class SparkleBot(Listener):
         # wr_main_temp_f = (wr_main_temp * (9/5.0)) - 459.67
 
         # Parsing for Wunderground
-        # pp = pprint.PrettyPrinter()
         # wr = weather_response["current_observation"]
-        # pp.pprint(wr)
-        wr_city = weather_response["current_observation"]["display_location"]["city"]
-        wr_main_temp_f = weather_response["current_observation"]["temperature_string"]
-        wr_weather_desc = weather_response["current_observation"]["weather"].lower()
+        # wr_city = weather_response["current_observation"]["display_location"]["city"]
+        # wr_main_temp_f = weather_response["current_observation"]["temperature_string"]
+        # wr_weather_desc = weather_response["current_observation"]["weather"].lower()
+
+        # Parsing for OpenWeatherMap 2020
+        wr_city = weather_response["name"]
+        wr_main_temp_f = weather_response["main"]["temp"]
+        wr_weather_desc = weather_response["weather"][0]["description"]
+
+        # pp.pprint("{} {} {}".format(wr_city, wr_main_temp_f, wr_weather_desc))
 
         # Create the response payload
-        message = "{}, {} is {} and is {}".format(
+        message = "{}, {} is {}F with a {}".format(
             requestor_name,
             wr_city,
             wr_main_temp_f,
             wr_weather_desc)
+        # pp.pprint(message)
 
         # Post the response
         self.post_result(room_id, message)
@@ -188,37 +207,42 @@ class SparkleBot(Listener):
 
     def do_movie(self, event):
         # print "doin' le MOVIE"       
-        # pp = pprint.PrettyPrinter()
+        pp = pprint.PrettyPrinter()
         msg_data = event.data.get('data')
         requestor_name = event.data.get('user_name')
         room_id = event.data.get('room_id')
         # Process the requested title
         title_keywords = ' '.join(msg_data.split()[2:]).strip()
         # pp.pprint(title_keywords)
-        # print "Parsing complete -", title_keywords
-        movie_response = MovieAPI.get_plot(self.om_api_key, title_keywords)
-        # pp.pprint(movie_response)
+        # pp.pprint("Parsing complete - {}".format(title_keywords))
+        movie_response = MovieAPI.get_movie_data(self.om_api_key, title_keywords)
+        pp.pprint(movie_response)
 
-    # {u'Actors': u'Jane Fonda, Lily Tomlin, Sam Waterston, Martin Sheen',
-    #  u'Awards': u'Nominated for 1 Golden Globe. Another 1 win & 14 nominations.',
-    #  u'Country': u'USA',
-    #  u'Director': u'N/A',
-    #  u'Genre': u'Comedy',
-    #  u'Language': u'English',
-    #  u'Metascore': u'N/A',
-    #  u'Plot': u'Finding out that their husbands are not just work partners, but have also been romantically involved for the last 20 years, two women with an already strained relationship try to cope with the circumstances together.',
-    #  u'Poster': u'http://ia.media-imdb.com/images/M/MV5BMTgwNTkyOTIwOF5BMl5BanBnXkFtZTgwMDg0MTQ1ODE@._V1_SX300.jpg',
-    #  u'Rated': u'TV-MA',
-    #  u'Released': u'08 May 2015',
-    #  u'Response': u'True',
-    #  u'Runtime': u'30 min',
-    #  u'Title': u'Grace and Frankie',
-    #  u'Type': u'series',
-    #  u'Writer': u'Marta Kauffman, Howard J. Morris',
-    #  u'Year': u'2015\u2013',
-    #  u'imdbID': u'tt3609352',
-    #  u'imdbRating': u'8.1',
-    #  u'imdbVotes': u'9,416'}
+    # {'Actors': 'Lily Tomlin, Jane Fonda, Sam Waterston, Martin Sheen',
+    #  'Awards': 'Nominated for 1 Golden Globe. Another 2 wins & 51 nominations.',
+    #  'Country': 'USA',
+    #  'Director': 'N/A',
+    #  'Genre': 'Comedy',
+    #  'Language': 'English',
+    #  'Metascore': 'N/A',
+    #  'Plot': 'Finding out that their husbands are not just work partners, but have '
+    #          'also been romantically involved for the last twenty years, two women '
+    #          'with an already strained relationship try to cope with the '
+    #          'circumstances together.',
+    #  'Poster': 'https://m.media-amazon.com/images/M/MV5BZDg1YmI4ZmUtMjNhYS00YWY5LTk0MGQtODI5MGMzNTI4MzYxXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg',
+    #  'Rated': 'TV-MA',
+    #  'Ratings': [{'Source': 'Internet Movie Database', 'Value': '8.3/10'}],
+    #  'Released': '08 May 2015',
+    #  'Response': 'True',
+    #  'Runtime': '30 min',
+    #  'Title': 'Grace and Frankie',
+    #  'Type': 'series',
+    #  'Writer': 'Marta Kauffman, Howard J. Morris',
+    #  'Year': '2015–',
+    #  'imdbID': 'tt3609352',
+    #  'imdbRating': '8.3',
+    #  'imdbVotes': '37,155',
+    #  'totalSeasons': '7'}
         movie_title = movie_response.get('Title')
         movie_writer = movie_response.get('Writer').split(',')[0]
         movie_plot = movie_response.get('Plot').strip()
@@ -230,7 +254,7 @@ class SparkleBot(Listener):
             movie_writer,
             movie_plot)
 
-        # pp.pprint(message)
+        pp.pprint(message)
 
         # Post the response
         self.post_result(room_id, message)
@@ -247,12 +271,15 @@ class SparkleBot(Listener):
         db.session.commit()
         endpoint = "{}/rooms/{}/messages".format(self.server_path, room_id)
         values = {'user_id': '{}'.format(self.user_id), 'data': message}
+        # FIXME 2020 - https://docs.python.org/3/library/urllib.request.html#urllib-examples ; encoding is at issue
         data = urllib.parse.urlencode(values)
-        # print("\n\n\nPosting {} to {} with uid {}\n\n\n".format(data, endpoint, self.user_id))
-        post_request = urllib.Request(endpoint, data)
+        data = data.encode('ascii')
+        print("\n\n\nPosting {} to {} with uid {}\n\n\n".format(data, endpoint, self.user_id))
+        post_request = urllib.request.Request(endpoint, data=data)
         post_response = urllib.request.urlopen(post_request)
-        response = post_response.read()
-        # print(response)
+        # post_response = urllib.request.urlopen(url=endpoint, data=data)
+        response = post_response.read().decode('utf-8')
+        print(response)
 
 
 class BabbleBot(Listener):
@@ -274,11 +301,11 @@ class BabbleBot(Listener):
                                       self.server_path)
 
     def get_user_id(self):
-        '''returns the user id SparkleBot is using, needed for responses'''
+        '''returns the user id BabbleBot is using, needed for responses'''
         return self.user_id
 
     def set_user_id(self, user_id):
-        '''adds a user id to SparkleBot, needed for responses'''
+        '''adds a user id to BabbleBot, needed for responses'''
         self.user_id = user_id
 
     def do_babble(self):
@@ -290,8 +317,8 @@ class BabbleBot(Listener):
         values = {'user_id': '{}'.format(self.user_id), 'data': message}
         data = urllib.urlencode(values)
         # print "\n\n\nPosting {} to {} with uid {}\n\n\n".format(data, endpoint, self.user_id)
-        post_request = urllib2.Request(endpoint, data)
-        post_response = urllib2.urlopen(post_request)
+        post_request = urllib.request.Request(endpoint, data)
+        post_response = urllib.request.urlopen(post_request)
         response = post_response.read()
         # print response
 
@@ -306,8 +333,8 @@ class BabbleBot(Listener):
 #           'location' : 'Northampton',
 #           'language' : 'Python' }
 # data = urllib.urlencode(values)
-# req = urllib2.Request(url, data)
-# response = urllib2.urlopen(req)
+# req = urllib.request.Request(url, data)
+# response = urllib.request.urlopen(req)
 # the_page = response.read()
 
 # url = 'http://192.168.1.3/epreuves/WEB/epreuve2/page2.php'
@@ -354,7 +381,7 @@ if __name__ == '__main__':
 
     weather_event = Event(
                    Event.Types.message_created_event,
-                   {"room_id":1, "data": "Pyro weather 94301", 'user_name': 'Balloonicorn', "user_id": 1})
+                   {"room_id":1, "data": "Pyro weather Alameda, CA, USA", 'user_name': 'Balloonicorn', "user_id": 1})
     w_out = sparkle.do_weather(weather_event)
     print(w_out)
 

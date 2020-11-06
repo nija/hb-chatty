@@ -70,7 +70,7 @@ class Markov(object):
 
         while not_legit_caps:
             # Get the beginning tuple
-            words_ngram = choice(self.chains.keys())
+            words_ngram = choice(list(self.chains.keys()))
             # Start with a capitalized word
             if words_ngram[0][0].isupper():
                 not_legit_caps = False

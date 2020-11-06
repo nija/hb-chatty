@@ -2,14 +2,14 @@
 # pylint: disable=I0011,C0103
 import json
 import urllib
-import urllib2
 import random
 
 # response = urllib2.urlopen('http://localhost:5001/api/users')
 # html = response.read()
 # print html
 
-server_path = 'http://localhost:5001/api'
+# server_path = 'http://localhost:5001/api'
+server_path = 'http://localhost:5014/api'
 bot_name = 'Pyro'
 bot_user_id = 0
 bot_room_ids = [1]
@@ -19,7 +19,7 @@ bot_responses = ["PYROOOOOOOO!"]
 
 def get_user_info():
 
-    response = urllib2.urlopen('{}/users'.format(server_path))
+    response = urllib.request.urlopen('{}/users'.format(server_path))
     jason = json.loads(response.read())
     j_list = jason["users"]
     for index, person in enumerate(j_list):
@@ -38,7 +38,7 @@ def get_chat_history_all():
     '''Gets all messages'''
     room_id = 1
     room_attr = "messages"
-    response = urllib2.urlopen('{}/rooms/{}/{}'.format(
+    response = urllib.request.urlopen('{}/rooms/{}/{}'.format(
                        server_path, room_id, room_attr))
     jason = json.loads(response.read())
     j_list = jason[room_attr]

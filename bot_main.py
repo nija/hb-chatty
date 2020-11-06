@@ -5,12 +5,11 @@ from listener import SparkleBot
 import os
 import re
 import urllib
-import urllib2
 from weather_api import WeatherAPI
 
 # 1- Register listeners on the bus
 bot_name = 'Pyro'
-zipcode = 94040
+location = "Mountain View, CA, USA"
 bus = Bus()
 bus.register(SparkleBot(bot_name, bus=bus, user_id=8), Event.Types.message_created_event)
 
@@ -19,7 +18,7 @@ num = 4
 for i in range(num):
     if i % num == 0:
         print "throwing message_created_event - weather"
-        bus.notify(Event(Event.Types.message_created_event, {"room_id":1, "data": "{} weather {}".format(bot_name, zipcode), "user_id": 2, "user_name": "Anony Mouse"}))
+        bus.notify(Event(Event.Types.message_created_event, {"room_id":1, "data": "{} weather {}".format(bot_name, location), "user_id": 2, "user_name": "Anony Mouse"}))
     elif i % num == 1:
         print "throwing message_created_event - help"
         bus.notify(Event(Event.Types.message_created_event, {"room_id":1, "data": "{} help".format(bot_name), "user_id": 2, "user_name": "Anony Mouse"}))

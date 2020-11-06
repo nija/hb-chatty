@@ -26,7 +26,7 @@ import sys
 import logging
 LOG_FILENAME = 'chatty.log'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
-logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
 
 logging.debug('This message should go to the log file')
 
