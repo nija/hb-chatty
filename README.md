@@ -67,7 +67,7 @@ Chatty has a full-featured and robust REST API, which allows for command-line in
 The chat bot uses the Wunderground API to display weather information by zipcode and the Open Movie Database API to display movie information. The chat bot can also generate natural language stories using Markov Chains. This implementation uses Alice in Wonderland and Through the Looking Glass as story data.
 
 ## <a name="eventbus"></a>Event Bus
-The chat server uses a custom, one-way Publish-Subscribe event bus to communicate events to the bot. The chat server publishes an event to the bus, which then handles the distributionof the event to the listeners subscribed to the event type. Currently, the bot is the only listener.
+The chat server uses a custom, one-way Publish-Subscribe event bus to communicate events to the bot. The chat server publishes an event to the bus, which then handles the distribution of the event to the listeners subscribed to the event type. Currently, the bot is the only listener.
 
 ## <a name="rely"></a>Reliability
 The web app is close to production-ready in that monitoring and healthcheck hooks exist, code coverage is around 80%, and continuous integration has been set up. The last steps are to lock down parts of the API, and set up continuous deployment using Travis-CI and Heroku.
